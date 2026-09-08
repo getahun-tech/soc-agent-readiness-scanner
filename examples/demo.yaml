@@ -1,0 +1,78 @@
+# Demo config for the bundled synthetic samples.
+#
+#   pip install -e .
+#   scanner scan --config examples/demo.yaml --format markdown
+#
+# Runs fully offline against file-based sources -- no network calls, no
+# credentials required.
+
+version: "1.0"
+ruleset_version: "2026.07"
+
+inventory:
+  path: ./samples/inventory/assets.csv
+  match_fields: [hostname, serial]
+
+defaults:
+  sample_size: 2000
+  sample_strategy: random
+  seed: 42
+
+field_hints:
+  origin: [host, reporting_device, proxy_host]
+  affected: [target, dst]
+  outcome: [action, result, status, disposition]
+  correlation: [session_id, trace_id, flow_id, transaction_id]
+
+sources:
+  - name: clean_firewall
+    adapter: file
+    path: ./samples/clean_firewall/*.jsonl
+    schema: cim:Network_Traffic
+    owner: "network-security@example.com"
+
+  - name: broken_syslog
+    adapter: file
+    path: ./samples/broken_syslog/*.log
+    owner: "network-ops@example.com"
+
+  - name: ambiguous_nodedown
+    adapter: file
+    path: ./samples/ambiguous_nodedown/*.jsonl
+    owner: "network-ops@example.com"
+
+  - name: pii_proxy_logs
+    adapter: file
+    path: ./samples/pii_proxy_logs/*.jsonl
+    # The proxy hosts aren't in the inventory, but the record content itself
+    # (event type, timestamp, entities, outcome, correlation key) is fully
+    # complete -- demonstrates a source that's completeness-strong even
+    # without inventory-backed attribution.
+    owner: "web-proxy-team@example.com"
+
+  - name: conflicting_pair_solarwinds
+    adapter: file
+    path: ./samples/conflicting_pair/solarwinds.jsonl
+    owner: "network-ops@example.com"
+
+  - name: conflicting_pair_meraki
+    adapter: file
+    path: ./samples/conflicting_pair/meraki.jsonl
+    owner: "network-ops@example.com"
+    # No precedence_rules entry links these two sources, even though they
+    # describe the same switches (sw01-sw10) with contradictory status --
+    # demonstrates the missing_precedence_rule conflict.
+
+  - name: origin_only_logs
+    adapter: file
+    path: ./samples/origin_only_logs/*.jsonl
+    # Well-attributed to its reporting device but fails C4 -- demonstrates
+    # the origin/C4 divergence that blocks automation eligibility.
+    owner: "network-ops@example.com"
+
+  - name: skewed_clocks
+    adapter: file
+    path: ./samples/skewed_clocks/*.jsonl
+    owner: "network-ops@example.com"
+
+precedence_rules: []

@@ -1,0 +1,10 @@
+completely unstructured line one with no discernible fields at all
+completely unstructured line two with no discernible fields at all
+completely unstructured line three with no discernible fields at all
+completely unstructured line four with no discernible fields at all
+completely unstructured line five with no discernible fields at all
+completely unstructured line six with no discernible fields at all
+completely unstructured line seven with no discernible fields at all
+completely unstructured line eight with no discernible fields at all
+{"timestamp": "2026-01-01T00:00:00Z", "host": "x1", "action": "ping"}
+{"timestamp": "2026-01-01T00:00:01Z", "host": "x2", "action": "ping"}

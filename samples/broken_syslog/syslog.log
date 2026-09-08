@@ -1,0 +1,1000 @@
+{"host": "sys02", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:00Z"}
+host=sys05 msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:00:03Z"}
+msg="disk usage warning threshold crossed"
+Unknown error code encountered during startup
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:06Z"}
+msg="service restarted after crash"
+Unknown error code encountered during startup
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:09Z"}
+host=sys03 msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"host": "sys01", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:00:12Z"}
+host=sys01 msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:00:15Z"}
+host=sys04 msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"host": "sys04", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:00:18Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"host": "sys03", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:21Z"}
+host=sys05 msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"host": "sys01", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:24Z"}
+msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"host": "sys04", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:00:27Z"}
+msg="unknown error code encountered during startup"
+Unexpected reboot detected, investigating
+{"host": "sys02", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:00:30Z"}
+msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"host": "sys02", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:33Z"}
+msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:36Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:00:39Z"}
+msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"host": "sys04", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:42Z"}
+host=sys05 msg="watchdog timer expired, resetting subsystem"
+Service restarted after crash
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:45Z"}
+host=sys03 msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:48Z"}
+host=sys03 msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:00:51Z"}
+host=sys03 msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:54Z"}
+msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:00:57Z"}
+host=sys05 msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:01:00Z"}
+host=sys05 msg="service restarted after crash"
+Service restarted after crash
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:01:03Z"}
+msg="unexpected reboot detected, investigating"
+Service restarted after crash
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:01:06Z"}
+host=sys01 msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:01:09Z"}
+host=sys05 msg="service restarted after crash"
+Service restarted after crash
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:01:12Z"}
+msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:01:15Z"}
+msg="service restarted after crash"
+Unknown error code encountered during startup
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:01:18Z"}
+host=sys04 msg="watchdog timer expired, resetting subsystem"
+Unknown error code encountered during startup
+{"host": "sys03", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:01:21Z"}
+host=sys02 msg="disk usage warning threshold crossed"
+Unknown error code encountered during startup
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:01:24Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:01:27Z"}
+msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"host": "sys04", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:01:30Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:01:33Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:01:36Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:01:39Z"}
+msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"host": "sys04", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:01:42Z"}
+msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:01:45Z"}
+msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"host": "sys01", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:01:48Z"}
+msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:01:51Z"}
+host=sys04 msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"host": "sys03", "msg": "service restarted after crash", "ts": "2026-01-01T00:01:54Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:01:57Z"}
+msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:02:00Z"}
+msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:02:03Z"}
+msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"host": "sys04", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:02:06Z"}
+host=sys03 msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:02:09Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unknown error code encountered during startup
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:02:12Z"}
+msg="unknown error code encountered during startup"
+Watchdog timer expired, resetting subsystem
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:02:15Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"host": "sys03", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:02:18Z"}
+host=sys04 msg="service restarted after crash"
+Unknown error code encountered during startup
+{"host": "sys04", "msg": "service restarted after crash", "ts": "2026-01-01T00:02:21Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unknown error code encountered during startup
+{"host": "sys02", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:02:24Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"host": "sys03", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:02:27Z"}
+msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:02:30Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unknown error code encountered during startup
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:02:33Z"}
+msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"host": "sys05", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:02:36Z"}
+msg="unknown error code encountered during startup"
+Unexpected reboot detected, investigating
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:02:39Z"}
+msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"host": "sys04", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:02:42Z"}
+msg="service restarted after crash"
+Service restarted after crash
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:02:45Z"}
+msg="unknown error code encountered during startup"
+Watchdog timer expired, resetting subsystem
+{"host": "sys01", "msg": "service restarted after crash", "ts": "2026-01-01T00:02:48Z"}
+host=sys02 msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:02:51Z"}
+msg="watchdog timer expired, resetting subsystem"
+Service restarted after crash
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:02:54Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:02:57Z"}
+msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"host": "sys02", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:03:00Z"}
+msg="service restarted after crash"
+Service restarted after crash
+{"host": "sys02", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:03:03Z"}
+msg="service restarted after crash"
+Unknown error code encountered during startup
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:03:06Z"}
+host=sys04 msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:03:09Z"}
+host=sys03 msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:03:12Z"}
+host=sys04 msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"host": "sys03", "msg": "service restarted after crash", "ts": "2026-01-01T00:03:15Z"}
+msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:03:18Z"}
+msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:03:21Z"}
+msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:03:24Z"}
+host=sys03 msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:03:27Z"}
+host=sys01 msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:03:30Z"}
+host=sys02 msg="unexpected reboot detected, investigating"
+Service restarted after crash
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:03:33Z"}
+host=sys03 msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"host": "sys04", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:03:36Z"}
+msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:03:39Z"}
+msg="service restarted after crash"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:03:42Z"}
+host=sys04 msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:03:45Z"}
+msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:03:48Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:03:51Z"}
+host=sys03 msg="unknown error code encountered during startup"
+Unexpected reboot detected, investigating
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:03:54Z"}
+msg="unexpected reboot detected, investigating"
+Service restarted after crash
+{"host": "sys03", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:03:57Z"}
+msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"host": "sys05", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:04:00Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unknown error code encountered during startup
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:04:03Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unknown error code encountered during startup
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:04:06Z"}
+host=sys02 msg="disk usage warning threshold crossed"
+Unknown error code encountered during startup
+{"host": "sys03", "msg": "service restarted after crash", "ts": "2026-01-01T00:04:09Z"}
+msg="unexpected reboot detected, investigating"
+Service restarted after crash
+{"host": "sys03", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:04:12Z"}
+host=sys02 msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:04:15Z"}
+msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"host": "sys02", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:04:18Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"host": "sys05", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:04:21Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:04:24Z"}
+host=sys01 msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"host": "sys02", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:04:27Z"}
+msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"host": "sys03", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:04:30Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:04:33Z"}
+msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:04:36Z"}
+host=sys03 msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:04:39Z"}
+msg="unknown error code encountered during startup"
+Watchdog timer expired, resetting subsystem
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:04:42Z"}
+msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:04:45Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:04:48Z"}
+msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"host": "sys05", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:04:51Z"}
+msg="watchdog timer expired, resetting subsystem"
+Service restarted after crash
+{"host": "sys02", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:04:54Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:04:57Z"}
+host=sys02 msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:05:00Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"host": "sys04", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:05:03Z"}
+msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:05:06Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:05:09Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:05:12Z"}
+msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:05:15Z"}
+msg="watchdog timer expired, resetting subsystem"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:05:18Z"}
+msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:05:21Z"}
+host=sys03 msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:05:24Z"}
+host=sys04 msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"host": "sys03", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:05:27Z"}
+msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:05:30Z"}
+msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"host": "sys01", "msg": "service restarted after crash", "ts": "2026-01-01T00:05:33Z"}
+msg="watchdog timer expired, resetting subsystem"
+Service restarted after crash
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:05:36Z"}
+host=sys05 msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:05:39Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"host": "sys01", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:05:42Z"}
+host=sys03 msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"host": "sys01", "msg": "service restarted after crash", "ts": "2026-01-01T00:05:45Z"}
+msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:05:48Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:05:51Z"}
+msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:05:54Z"}
+msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:05:57Z"}
+host=sys04 msg="unknown error code encountered during startup"
+Unexpected reboot detected, investigating
+{"host": "sys02", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:06:00Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"host": "sys02", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:06:03Z"}
+msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:06:06Z"}
+host=sys03 msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:06:09Z"}
+msg="unknown error code encountered during startup"
+Unexpected reboot detected, investigating
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:06:12Z"}
+msg="service restarted after crash"
+Unknown error code encountered during startup
+{"host": "sys05", "msg": "service restarted after crash", "ts": "2026-01-01T00:06:15Z"}
+msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:06:18Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"host": "sys04", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:06:21Z"}
+msg="unexpected reboot detected, investigating"
+Service restarted after crash
+{"host": "sys02", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:06:24Z"}
+msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:06:27Z"}
+host=sys05 msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"host": "sys02", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:06:30Z"}
+host=sys05 msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:06:33Z"}
+msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:06:36Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:06:39Z"}
+host=sys05 msg="disk usage warning threshold crossed"
+Unknown error code encountered during startup
+{"host": "sys03", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:06:42Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"host": "sys01", "msg": "service restarted after crash", "ts": "2026-01-01T00:06:45Z"}
+msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:06:48Z"}
+msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"host": "sys04", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:06:51Z"}
+host=sys01 msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"host": "sys01", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:06:54Z"}
+host=sys01 msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"host": "sys03", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:06:57Z"}
+host=sys01 msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:07:00Z"}
+msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"host": "sys02", "msg": "service restarted after crash", "ts": "2026-01-01T00:07:03Z"}
+msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:07:06Z"}
+host=sys05 msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:07:09Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:07:12Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:07:15Z"}
+host=sys05 msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:07:18Z"}
+host=sys03 msg="unexpected reboot detected, investigating"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:07:21Z"}
+host=sys01 msg="service restarted after crash"
+Service restarted after crash
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:07:24Z"}
+host=sys05 msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:07:27Z"}
+host=sys03 msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:07:30Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:07:33Z"}
+host=sys04 msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:07:36Z"}
+msg="unknown error code encountered during startup"
+Watchdog timer expired, resetting subsystem
+{"host": "sys03", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:07:39Z"}
+msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"host": "sys05", "msg": "service restarted after crash", "ts": "2026-01-01T00:07:42Z"}
+msg="watchdog timer expired, resetting subsystem"
+Service restarted after crash
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:07:45Z"}
+msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"host": "sys03", "msg": "service restarted after crash", "ts": "2026-01-01T00:07:48Z"}
+host=sys05 msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:07:51Z"}
+msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"host": "sys02", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:07:54Z"}
+host=sys03 msg="service restarted after crash"
+Service restarted after crash
+{"host": "sys04", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:07:57Z"}
+msg="service restarted after crash"
+Service restarted after crash
+{"host": "sys02", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:08:00Z"}
+msg="service restarted after crash"
+Service restarted after crash
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:08:03Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:08:06Z"}
+host=sys04 msg="unknown error code encountered during startup"
+Service restarted after crash
+{"host": "sys01", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:08:09Z"}
+msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:08:12Z"}
+host=sys01 msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:08:15Z"}
+host=sys01 msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:08:18Z"}
+host=sys03 msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:08:21Z"}
+host=sys05 msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:08:24Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:08:27Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"host": "sys02", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:08:30Z"}
+msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:08:33Z"}
+msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:08:36Z"}
+msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:08:39Z"}
+host=sys03 msg="service restarted after crash"
+Unknown error code encountered during startup
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:08:42Z"}
+msg="disk usage warning threshold crossed"
+Unknown error code encountered during startup
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:08:45Z"}
+msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:08:48Z"}
+host=sys05 msg="watchdog timer expired, resetting subsystem"
+Unknown error code encountered during startup
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:08:51Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:08:54Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"host": "sys01", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:08:57Z"}
+msg="unknown error code encountered during startup"
+Watchdog timer expired, resetting subsystem
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:09:00Z"}
+msg="watchdog timer expired, resetting subsystem"
+Service restarted after crash
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:09:03Z"}
+msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:09:06Z"}
+host=sys05 msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:09:09Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:09:12Z"}
+host=sys02 msg="service restarted after crash"
+Unknown error code encountered during startup
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:09:15Z"}
+msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:09:18Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:09:21Z"}
+msg="unexpected reboot detected, investigating"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:09:24Z"}
+host=sys01 msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"host": "sys04", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:09:27Z"}
+host=sys05 msg="disk usage warning threshold crossed"
+Unknown error code encountered during startup
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:09:30Z"}
+msg="disk usage warning threshold crossed"
+Unknown error code encountered during startup
+{"host": "sys03", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:09:33Z"}
+msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:09:36Z"}
+msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:09:39Z"}
+host=sys04 msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:09:42Z"}
+msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:09:45Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:09:48Z"}
+host=sys05 msg="watchdog timer expired, resetting subsystem"
+Unknown error code encountered during startup
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:09:51Z"}
+msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"host": "sys04", "msg": "service restarted after crash", "ts": "2026-01-01T00:09:54Z"}
+host=sys05 msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"host": "sys03", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:09:57Z"}
+host=sys02 msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:10:00Z"}
+host=sys01 msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:10:03Z"}
+host=sys05 msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:10:06Z"}
+host=sys03 msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"host": "sys03", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:10:09Z"}
+msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:10:12Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"host": "sys05", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:10:15Z"}
+msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"host": "sys03", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:10:18Z"}
+msg="unknown error code encountered during startup"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:10:21Z"}
+msg="service restarted after crash"
+Unknown error code encountered during startup
+{"host": "sys02", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:10:24Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:10:27Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:10:30Z"}
+msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:10:33Z"}
+host=sys02 msg="disk usage warning threshold crossed"
+Unknown error code encountered during startup
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:10:36Z"}
+host=sys01 msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:10:39Z"}
+host=sys03 msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:10:42Z"}
+host=sys02 msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"host": "sys01", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:10:45Z"}
+msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:10:48Z"}
+host=sys03 msg="unexpected reboot detected, investigating"
+Service restarted after crash
+{"host": "sys04", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:10:51Z"}
+msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:10:54Z"}
+msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:10:57Z"}
+msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"host": "sys03", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:11:00Z"}
+msg="service restarted after crash"
+Unknown error code encountered during startup
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:11:03Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"host": "sys05", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:11:06Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"host": "sys04", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:11:09Z"}
+msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:11:12Z"}
+host=sys02 msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:11:15Z"}
+msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"host": "sys01", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:11:18Z"}
+msg="unknown error code encountered during startup"
+Unexpected reboot detected, investigating
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:11:21Z"}
+msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:11:24Z"}
+msg="unknown error code encountered during startup"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:11:27Z"}
+msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"host": "sys04", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:11:30Z"}
+msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"host": "sys04", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:11:33Z"}
+host=sys03 msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"host": "sys02", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:11:36Z"}
+host=sys03 msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"host": "sys04", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:11:39Z"}
+msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"host": "sys03", "msg": "service restarted after crash", "ts": "2026-01-01T00:11:42Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"host": "sys01", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:11:45Z"}
+msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:11:48Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"host": "sys02", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:11:51Z"}
+msg="unknown error code encountered during startup"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:11:54Z"}
+msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:11:57Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:12:00Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:12:03Z"}
+host=sys04 msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:12:06Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"host": "sys02", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:12:09Z"}
+msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"host": "sys01", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:12:12Z"}
+host=sys01 msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:12:15Z"}
+msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:12:18Z"}
+host=sys02 msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"host": "sys03", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:12:21Z"}
+host=sys01 msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:12:24Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"host": "sys02", "msg": "service restarted after crash", "ts": "2026-01-01T00:12:27Z"}
+msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:12:30Z"}
+msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:12:33Z"}
+host=sys02 msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:12:36Z"}
+msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:12:39Z"}
+host=sys04 msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"host": "sys04", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:12:42Z"}
+host=sys01 msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:12:45Z"}
+msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"host": "sys02", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:12:48Z"}
+msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"host": "sys03", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:12:51Z"}
+host=sys04 msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:12:54Z"}
+host=sys02 msg="watchdog timer expired, resetting subsystem"
+Service restarted after crash
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:12:57Z"}
+msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:13:00Z"}
+host=sys03 msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:13:03Z"}
+msg="watchdog timer expired, resetting subsystem"
+Service restarted after crash
+{"host": "sys01", "msg": "service restarted after crash", "ts": "2026-01-01T00:13:06Z"}
+host=sys04 msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:13:09Z"}
+host=sys02 msg="service restarted after crash"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:13:12Z"}
+msg="service restarted after crash"
+Unknown error code encountered during startup
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:13:15Z"}
+host=sys01 msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:13:18Z"}
+host=sys05 msg="watchdog timer expired, resetting subsystem"
+Unknown error code encountered during startup
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:13:21Z"}
+msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:13:24Z"}
+host=sys04 msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"host": "sys01", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:13:27Z"}
+msg="service restarted after crash"
+Service restarted after crash
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:13:30Z"}
+host=sys02 msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:13:33Z"}
+msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"host": "sys03", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:13:36Z"}
+msg="unknown error code encountered during startup"
+Watchdog timer expired, resetting subsystem
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:13:39Z"}
+msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:13:42Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:13:45Z"}
+msg="service restarted after crash"
+Unknown error code encountered during startup
+{"host": "sys02", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:13:48Z"}
+host=sys01 msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:13:51Z"}
+msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:13:54Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:13:57Z"}
+msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:14:00Z"}
+msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:14:03Z"}
+host=sys03 msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"host": "sys03", "msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:14:06Z"}
+msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:14:09Z"}
+msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:14:12Z"}
+host=sys05 msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:14:15Z"}
+msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:14:18Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:14:21Z"}
+host=sys03 msg="unknown error code encountered during startup"
+Service restarted after crash
+{"host": "sys02", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:14:24Z"}
+host=sys01 msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:14:27Z"}
+msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:14:30Z"}
+msg="watchdog timer expired, resetting subsystem"
+Unknown error code encountered during startup
+{"host": "sys05", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:14:33Z"}
+msg="disk usage warning threshold crossed"
+Disk usage warning threshold crossed
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:14:36Z"}
+host=sys03 msg="watchdog timer expired, resetting subsystem"
+Unexpected reboot detected, investigating
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:14:39Z"}
+msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:14:42Z"}
+msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:14:45Z"}
+host=sys04 msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:14:48Z"}
+msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:14:51Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:14:54Z"}
+host=sys05 msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"host": "sys05", "msg": "service restarted after crash", "ts": "2026-01-01T00:14:57Z"}
+msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:15:00Z"}
+msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"host": "sys01", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:15:03Z"}
+msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:15:06Z"}
+msg="unexpected reboot detected, investigating"
+Service restarted after crash
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:15:09Z"}
+host=sys03 msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:15:12Z"}
+msg="unknown error code encountered during startup"
+Unknown error code encountered during startup
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:15:15Z"}
+msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"host": "sys03", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:15:18Z"}
+host=sys01 msg="unexpected reboot detected, investigating"
+Unknown error code encountered during startup
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:15:21Z"}
+host=sys04 msg="service restarted after crash"
+Watchdog timer expired, resetting subsystem
+{"host": "sys02", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:15:24Z"}
+host=sys05 msg="watchdog timer expired, resetting subsystem"
+Disk usage warning threshold crossed
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:15:27Z"}
+msg="disk usage warning threshold crossed"
+Unexpected reboot detected, investigating
+{"host": "sys03", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:15:30Z"}
+host=sys05 msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:15:33Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"host": "sys03", "msg": "service restarted after crash", "ts": "2026-01-01T00:15:36Z"}
+msg="unknown error code encountered during startup"
+Disk usage warning threshold crossed
+{"msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:15:39Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"host": "sys02", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:15:42Z"}
+msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"host": "sys04", "msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:15:45Z"}
+host=sys04 msg="unknown error code encountered during startup"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:15:48Z"}
+msg="disk usage warning threshold crossed"
+Watchdog timer expired, resetting subsystem
+{"host": "sys04", "msg": "service restarted after crash", "ts": "2026-01-01T00:15:51Z"}
+msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:15:54Z"}
+host=sys03 msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"host": "sys03", "msg": "service restarted after crash", "ts": "2026-01-01T00:15:57Z"}
+host=sys03 msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:16:00Z"}
+host=sys01 msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:16:03Z"}
+msg="watchdog timer expired, resetting subsystem"
+Service restarted after crash
+{"host": "sys04", "msg": "watchdog timer expired, resetting subsystem", "ts": "2026-01-01T00:16:06Z"}
+host=sys01 msg="service restarted after crash"
+Unexpected reboot detected, investigating
+{"host": "sys03", "msg": "service restarted after crash", "ts": "2026-01-01T00:16:09Z"}
+host=sys03 msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:16:12Z"}
+host=sys02 msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:16:15Z"}
+msg="unexpected reboot detected, investigating"
+Unexpected reboot detected, investigating
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:16:18Z"}
+host=sys02 msg="unknown error code encountered during startup"
+Unexpected reboot detected, investigating
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:16:21Z"}
+msg="watchdog timer expired, resetting subsystem"
+Watchdog timer expired, resetting subsystem
+{"msg": "unknown error code encountered during startup", "ts": "2026-01-01T00:16:24Z"}
+msg="unknown error code encountered during startup"
+Service restarted after crash
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:16:27Z"}
+host=sys04 msg="unexpected reboot detected, investigating"
+Disk usage warning threshold crossed
+{"msg": "service restarted after crash", "ts": "2026-01-01T00:16:30Z"}
+msg="unexpected reboot detected, investigating"
+Watchdog timer expired, resetting subsystem
+{"host": "sys01", "msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:16:33Z"}
+msg="disk usage warning threshold crossed"
+Service restarted after crash
+{"msg": "unexpected reboot detected, investigating", "ts": "2026-01-01T00:16:36Z"}
+msg="service restarted after crash"
+Disk usage warning threshold crossed
+{"msg": "disk usage warning threshold crossed", "ts": "2026-01-01T00:16:39Z"}

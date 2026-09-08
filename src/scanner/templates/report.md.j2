@@ -1,0 +1,97 @@
+{%- macro status_badge(status) -%}
+{%- if status == "PASS" -%}PASS
+{%- elif status == "WARN" -%}WARN
+{%- elif status == "FAIL" -%}**FAIL**
+{%- else -%}NOT ASSESSED
+{%- endif -%}
+{%- endmacro -%}
+{%- macro dim_score(dim) -%}
+{{ dim.score }}/{{ dim.denominator }}{% if dim.percent is not none %} ({{ dim.percent }}%){% endif %}{% if dim.not_assessed_checks %} ({{ dim.not_assessed_checks | join(', ') }} not assessed){% endif %}
+{%- endmacro -%}
+{%- macro records_failed_line(c) -%}
+{%- if c.records_total %}  - **{{ c.records_failed }}/{{ c.records_total }} logs failed this check ({{ c.records_failed_percent }}%)**{% endif -%}
+{%- endmacro -%}
+# Event Log Completeness Scanner Report
+
+## Run metadata
+
+- Config: `{{ run_metadata.config_path }}`{{ " (sha256 `" ~ run_metadata.config_hash ~ "`)" if run_metadata.config_hash else "" }}
+- Config version: `{{ run_metadata.config_version }}` / Ruleset version: `{{ run_metadata.ruleset_version }}`
+- Operator: {{ run_metadata.operator or "unknown" }}
+- Generated at: {{ run_metadata.generated_at }}
+- Sources scanned: {{ run_metadata.sources_scanned | length }}
+
+## Estate summary
+
+| Source | Status | Note |
+| --- | --- | --- |
+{% for s in sources -%}
+| {{ s.name }} | {{ s.status }} | {{ s.error or "" }} |
+{% endfor %}
+
+**Automation eligibility:** {{ estate_summary.eligible_count }}/{{ estate_summary.sources_scanned }} scanned source(s) are automation-eligible.
+
+{% if estate_summary.top_blocking_gates -%}
+**Top blocking gates** (most common reason sources are ineligible):
+
+{% for gate_id, count in estate_summary.top_blocking_gates -%}
+- `{{ gate_id }}` blocks {{ count }} source(s)
+{% endfor %}
+{% endif %}
+
+## Per-source detail
+
+{% for s in sources %}
+### {{ s.name }}
+
+{% if s.status != "ok" -%}
+**Status:** {{ s.status }} -- {{ s.error }}
+{% else -%}
+- Adapter: `{{ s.adapter }}`
+- Owner: {{ s.owner }}
+- Sample: {{ s.sample.actual_size }}/{{ s.sample.requested_size }} requested, strategy=`{{ s.sample.strategy }}`, seed={{ s.sample.seed }}, population={{ s.sample.population_size }}
+
+**Score:** {{ dim_score(s.verdict.completeness) }} (C6 excluded)
+
+**Automation eligibility:** {{ "ELIGIBLE" if s.verdict.eligibility.eligible else "**NOT ELIGIBLE**" }}
+{% if not s.verdict.eligibility.eligible %}
+{% for g in s.verdict.eligibility.gates %}
+{% if not g.passed -%}
+  - **{{ g.gate_id }}** ({{ g.description }}): {{ g.reason }} -- owner: {{ g.owning_team_email }}
+{% endif -%}
+{% endfor %}
+{% endif %}
+
+{% if s.checks -%}
+**Completeness (C1-C7)**
+
+{% for c in s.checks %}
+- **{{ c.check_id }} -- {{ c.name }}**: {{ status_badge(c.status) }}
+{{ records_failed_line(c) }}
+{% for f in c.findings %}
+  - {{ f }}
+{% endfor -%}
+{% endfor -%}
+{% endif -%}
+{% endif %}
+{% endfor %}
+
+## Conflicts
+
+{% if conflicts -%}
+{% for c in conflicts -%}
+- **[{{ c.severity | upper }}] {{ c.category }}** ({{ c.sources | join(', ') }}): {{ c.description }}
+{% endfor %}
+{% else -%}
+No conflicts detected.
+{% endif %}
+
+## Recommendations
+
+{% if recommendations -%}
+{% for r in recommendations -%}
+- **[{{ r.status }}] {{ r.source }} / {{ r.check_id }} ({{ r.check_name }})** -- owner: {{ r.owner }} -- {{ r.finding }}
+{% endfor %}
+{% else -%}
+None.
+{% endif %}

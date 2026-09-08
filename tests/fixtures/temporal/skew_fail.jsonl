@@ -1,0 +1,10 @@
+{"host": "originA", "timestamp": "2026-01-01T00:00:00Z", "ingest_time": "2026-01-01T00:00:02Z"}
+{"host": "originA", "timestamp": "2026-01-01T00:00:02Z", "ingest_time": "2026-01-01T00:00:04Z"}
+{"host": "originA", "timestamp": "2026-01-01T00:00:04Z", "ingest_time": "2026-01-01T00:00:06Z"}
+{"host": "originA", "timestamp": "2026-01-01T00:00:06Z", "ingest_time": "2026-01-01T00:00:08Z"}
+{"host": "originA", "timestamp": "2026-01-01T00:00:08Z", "ingest_time": "2026-01-01T00:00:10Z"}
+{"host": "originB", "timestamp": "2026-01-01T00:00:40Z", "ingest_time": "2026-01-01T00:00:42Z"}
+{"host": "originB", "timestamp": "2026-01-01T00:00:42Z", "ingest_time": "2026-01-01T00:00:44Z"}
+{"host": "originB", "timestamp": "2026-01-01T00:00:44Z", "ingest_time": "2026-01-01T00:00:46Z"}
+{"host": "originB", "timestamp": "2026-01-01T00:00:46Z", "ingest_time": "2026-01-01T00:00:48Z"}
+{"host": "originB", "timestamp": "2026-01-01T00:00:48Z", "ingest_time": "2026-01-01T00:00:50Z"}

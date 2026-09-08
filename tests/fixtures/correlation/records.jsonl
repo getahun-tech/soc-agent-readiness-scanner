@@ -1,0 +1,5 @@
+{"host": "h1", "trace_id": "t-0001"}
+{"host": "h1", "trace_id": "t-0002"}
+{"host": "h2", "trace_id": "t-0003"}
+{"host": "h1", "trace_id": "t-0004"}
+{"host": "h2", "trace_id": "t-0005"}

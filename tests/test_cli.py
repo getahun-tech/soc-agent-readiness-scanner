@@ -1,0 +1,183 @@
+import json
+import re
+from pathlib import Path
+
+import pytest
+from typer.testing import CliRunner
+
+from scanner.cli import app
+
+_TIMESTAMP_RE = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+\+00:00")
+
+
+def _normalize(text: str) -> str:
+    """Strip the one genuinely nondeterministic field (the wall-clock
+    generated_at timestamp) so two runs' raw text output can be compared
+    byte-for-byte."""
+    return _TIMESTAMP_RE.sub("<TIMESTAMP>", text)
+
+
+FIXTURES = Path(__file__).parent / "fixtures"
+runner = CliRunner()
+
+
+@pytest.fixture(autouse=True)
+def _isolate_cwd(tmp_path, monkeypatch):
+    # `scan`'s default --journal path is relative ("./scanner_journal.jsonl") --
+    # without this, every test in this module would write into the real repo
+    # directory instead of the test's own tmp_path.
+    monkeypatch.chdir(tmp_path)
+
+
+def _write_config(tmp_path: Path, source_path: str, adapter: str = "file", extra: str = "") -> Path:
+    p = tmp_path / "config.yaml"
+    splunk_block = 'splunk:\n  host: "splunk.example.com"\n' if adapter == "splunk" else ""
+    p.write_text(f"""
+version: "1.0"
+ruleset_version: "test"
+defaults:
+  sample_size: 100
+  sample_strategy: random
+  seed: 1
+{splunk_block}sources:
+  - name: test_source
+    adapter: {adapter}
+    {"path: " + source_path if adapter == "file" else "query: 'index=test'"}
+    owner: "ops@example.com"
+{extra}
+""")
+    return p
+
+
+def test_validate_config_success(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    result = runner.invoke(app, ["validate-config", "--config", str(cfg_path)])
+    assert result.exit_code == 0
+    assert "Config valid" in result.stdout
+
+
+def test_validate_config_failure(tmp_path):
+    p = tmp_path / "bad.yaml"
+    p.write_text("not: [valid, since, sources, missing]")
+    result = runner.invoke(app, ["validate-config", "--config", str(p)])
+    assert result.exit_code == 1
+
+
+def test_validate_config_missing_file():
+    result = runner.invoke(app, ["validate-config", "--config", "/no/such/file.yaml"])
+    assert result.exit_code == 1
+
+
+def test_scan_produces_json_report(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    result = runner.invoke(app, ["scan", "--config", str(cfg_path)])
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["run_metadata"]["config_version"] == "1.0"
+    assert payload["sources"]["test_source"]["status"] == "ok"
+    assert payload["sources"]["test_source"]["profile"]["record_count"] == 10
+    assert payload["sources"]["test_source"]["sample"]["seed"] == 1
+
+
+def test_scan_writes_to_output_file(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    out_path = tmp_path / "report.json"
+    result = runner.invoke(app, ["scan", "--config", str(cfg_path), "--output", str(out_path)])
+    assert result.exit_code == 0
+    payload = json.loads(out_path.read_text())
+    assert payload["sources"]["test_source"]["status"] == "ok"
+
+
+def test_scan_splunk_source_without_token_env_var_reports_error(tmp_path, monkeypatch):
+    # No live Splunk to test against here -- this exercises the credential
+    # guard, not the adapter's happy path (see test_splunk_adapter.py for
+    # that, against a fake connection).
+    monkeypatch.delenv("SPLUNK_TOKEN", raising=False)
+    cfg_path = _write_config(tmp_path, "", adapter="splunk")
+    result = runner.invoke(app, ["scan", "--config", str(cfg_path)])
+    assert result.exit_code == 1
+    payload = json.loads(result.stdout)
+    assert payload["sources"]["test_source"]["status"] == "error"
+    assert "SPLUNK_TOKEN" in payload["sources"]["test_source"]["error"]
+
+
+def test_scan_unknown_source_name_errors(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    result = runner.invoke(app, ["scan", "--config", str(cfg_path), "--source", "ghost"])
+    assert result.exit_code == 1
+
+
+def test_scan_html_format_produces_standalone_html(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    result = runner.invoke(app, ["scan", "--config", str(cfg_path), "--format", "html"])
+    assert result.exit_code == 0
+    assert "<!doctype html>" in result.stdout.lower()
+    assert "<style>" in result.stdout  # inline CSS, no external assets
+    assert "http://" not in result.stdout and "https://" not in result.stdout
+    assert "test_source" in result.stdout
+
+
+def test_scan_invalid_format_errors(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    result = runner.invoke(app, ["scan", "--config", str(cfg_path), "--format", "yaml"])
+    assert result.exit_code == 1
+
+
+def test_scan_writes_journal_entry(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    journal_path = tmp_path / "journal.jsonl"
+    result = runner.invoke(app, ["scan", "--config", str(cfg_path), "--journal", str(journal_path)])
+    assert result.exit_code == 0
+    entries = [json.loads(line) for line in journal_path.read_text(encoding="utf-8").splitlines()]
+    assert len(entries) == 1
+    assert entries[0]["sources_scanned"] == ["test_source"]
+
+
+def test_scan_journal_can_be_disabled(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    result = runner.invoke(app, ["scan", "--config", str(cfg_path), "--journal", ""])
+    assert result.exit_code == 0
+    assert not (tmp_path / "scanner_journal.jsonl").exists()
+
+
+def test_scan_deterministic_output(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "mixed_formats" / "*.log"))
+    r1 = runner.invoke(app, ["scan", "--config", str(cfg_path)])
+    r2 = runner.invoke(app, ["scan", "--config", str(cfg_path)])
+    p1 = json.loads(r1.stdout)
+    p2 = json.loads(r2.stdout)
+    # generated_at will differ; strip it before comparing the rest for determinism.
+    del p1["run_metadata"]["generated_at"]
+    del p2["run_metadata"]["generated_at"]
+    assert p1 == p2
+
+
+def test_scan_json_output_is_byte_identical_across_runs(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "mixed_formats" / "*.log"))
+    r1 = runner.invoke(app, ["scan", "--config", str(cfg_path)])
+    r2 = runner.invoke(app, ["scan", "--config", str(cfg_path)])
+    assert _normalize(r1.stdout) == _normalize(r2.stdout)
+
+
+def test_scan_markdown_output_is_byte_identical_across_runs(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "mixed_formats" / "*.log"))
+    r1 = runner.invoke(app, ["scan", "--config", str(cfg_path), "--format", "markdown"])
+    r2 = runner.invoke(app, ["scan", "--config", str(cfg_path), "--format", "markdown"])
+    assert _normalize(r1.stdout) == _normalize(r2.stdout)
+
+
+def test_scan_html_output_is_byte_identical_across_runs(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "mixed_formats" / "*.log"))
+    r1 = runner.invoke(app, ["scan", "--config", str(cfg_path), "--format", "html"])
+    r2 = runner.invoke(app, ["scan", "--config", str(cfg_path), "--format", "html"])
+    assert _normalize(r1.stdout) == _normalize(r2.stdout)
+
+
+def test_scan_random_strategy_output_is_byte_identical_across_runs(tmp_path):
+    # sample_strategy defaults to "random" in _write_config -- this is the one
+    # path where nondeterminism could sneak in if the seed weren't actually
+    # threaded through consistently.
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "attribution" / "records.jsonl"))
+    r1 = runner.invoke(app, ["scan", "--config", str(cfg_path)])
+    r2 = runner.invoke(app, ["scan", "--config", str(cfg_path)])
+    assert _normalize(r1.stdout) == _normalize(r2.stdout)

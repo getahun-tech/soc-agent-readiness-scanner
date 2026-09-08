@@ -1,0 +1,3 @@
+{"timestamp": "2026-01-01T00:00:00Z", "user": "alice", "Result": "success"}
+{"timestamp": "2026-01-01T00:00:01Z", "user": "bob", "Result": "success"}
+{"timestamp": "2026-01-01T00:00:02Z", "user": "carol", "Result": "success"}

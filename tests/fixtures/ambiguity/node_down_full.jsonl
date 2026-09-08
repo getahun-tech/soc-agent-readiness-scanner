@@ -1,0 +1,5 @@
+{"action": "Node Down", "host": "sw1", "maintenance_window": true}
+{"action": "Node Down", "host": "sw2", "maintenance_window": false}
+{"action": "Node Down", "host": "sw3", "secondary_poller_result": "confirmed"}
+{"action": "Node Down", "host": "sw4", "icmp_status": "unreachable"}
+{"action": "Node Down", "host": "sw5", "maintenance_window": true}

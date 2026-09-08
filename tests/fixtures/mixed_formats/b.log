@@ -1,0 +1,2 @@
+{"timestamp": "2026-01-01T00:01:00Z", "host": "fw03", "action": "block", "dst": "10.0.0.9"}
+{"timestamp": "2026-01-01T00:01:05Z", "host": "fw03", "action": "block", "dst": "10.0.0.10"}

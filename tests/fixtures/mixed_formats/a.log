@@ -1,0 +1,5 @@
+{"timestamp": "2026-01-01T00:00:00Z", "host": "fw01", "action": "block", "dst": "10.0.0.5"}
+{"timestamp": "2026-01-01T00:00:05Z", "host": "fw01", "action": "allow", "dst": "10.0.0.6"}
+host=fw02 action=block dst=10.0.0.7 timestamp=2026-01-01T00:00:10Z
+this is a completely unstructured free text log line with no fields
+{"timestamp": "2026-01-01T00:00:02Z", "host": "fw01", "action": "allow", "dst": "10.0.0.8"}

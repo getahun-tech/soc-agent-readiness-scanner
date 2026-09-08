@@ -1,0 +1,5 @@
+{"action": "block", "reason": "policy_violation"}
+{"action": "block", "reason": "rate_limit_exceeded"}
+{"action": "allow", "reason": "trusted_source"}
+{"action": "block", "reason": "policy_violation"}
+{"action": "allow", "reason": "trusted_source"}

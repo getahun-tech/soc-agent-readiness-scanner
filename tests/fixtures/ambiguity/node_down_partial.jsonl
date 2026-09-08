@@ -1,0 +1,5 @@
+{"action": "Node Down", "host": "sw1", "maintenance_window": true}
+{"action": "Node Down", "host": "sw2", "maintenance_window": true}
+{"action": "Node Down", "host": "sw3"}
+{"action": "Node Down", "host": "sw4"}
+{"action": "Node Down", "host": "sw5"}
