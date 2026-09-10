@@ -6,7 +6,7 @@
 {% for c in checks %}
   <li class="check">
     <div class="check-head"><span class="check-id">{{ c.check_id }}</span> {{ c.name }} {{ badge(c.status) }}</div>
-    {% if c.records_total %}<div class="records-failed">{{ c.records_failed }}/{{ c.records_total }} logs failed this check ({{ c.records_failed_percent }}%)</div>{% endif %}
+    {% if c.records_total and c.status != "NOT_ASSESSED" %}<div class="records-failed">{{ c.records_failed }}/{{ c.records_total }} logs failed this check ({{ c.records_failed_percent }}%)</div>{% endif %}
     <ul class="findings">
       {% for f in c.findings %}<li>{{ f }}</li>{% endfor %}
     </ul>

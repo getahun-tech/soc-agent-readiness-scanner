@@ -7,6 +7,7 @@ from scanner.checks.completeness.c4_affected_entity import C4AffectedEntity
 from scanner.checks.completeness.c5_outcome import C5Outcome
 from scanner.checks.completeness.c6_causality import C6Causality
 from scanner.checks.completeness.c7_correlatability import C7Correlatability
+from scanner.checks.completeness.c8_actor import C8Actor
 from tests.helpers import build_ctx as _ctx
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -233,3 +234,67 @@ def test_c7_fail_when_no_key_constructible():
     ctx = _ctx(str(FIXTURES / "high_cardinality" / "records.jsonl"))
     r = C7Correlatability().run(ctx)
     assert r.status == "FAIL"
+
+
+# --- C8: actor / initiator (applicability is declared via event_class) -----
+
+
+def test_c8_pass_for_activity_source_with_actor_field():
+    # simple fixture carries 'user' in every record; declared activity -> scored.
+    ctx = _ctx(str(FIXTURES / "simple" / "records.jsonl"), event_class="activity")
+    r = C8Actor().run(ctx)
+    assert r.status == "PASS"
+    assert r.evidence["field"] == "user"
+    assert r.evidence["presence_rate"] == 1.0
+
+
+def test_c8_fail_for_activity_source_without_actor_field():
+    ctx = _ctx(str(FIXTURES / "src_dst" / "records.jsonl"), event_class="activity")
+    r = C8Actor().run(ctx)
+    assert r.status == "FAIL"
+    assert r.evidence["field"] is None
+
+
+def test_c8_not_assessed_for_state_source_even_when_actor_field_exists():
+    # A state-event source has no actor by definition -- the declaration
+    # wins over whatever fields happen to be present.
+    ctx = _ctx(str(FIXTURES / "simple" / "records.jsonl"), event_class="state")
+    r = C8Actor().run(ctx)
+    assert r.status == "NOT_ASSESSED"
+    assert r.score is None
+    assert any("state" in f for f in r.findings)
+
+
+def test_c8_undeclared_is_advisory_not_scored():
+    # No event_class declared -> NOT_ASSESSED (nothing false-fails out of
+    # the box), but the findings still report what an actor scan found and
+    # how to opt in.
+    ctx = _ctx(str(FIXTURES / "simple" / "records.jsonl"))
+    r = C8Actor().run(ctx)
+    assert r.status == "NOT_ASSESSED"
+    assert r.score is None
+    assert r.evidence["field"] == "user"  # still detected and reported
+    assert any("event_class" in f for f in r.findings)
+
+
+def test_c8_mixed_softens_fail_to_warn():
+    # event_class: mixed interleaves state events, so a missing actor field
+    # is expected for part of the sample -- FAIL softens to WARN.
+    ctx = _ctx(str(FIXTURES / "src_dst" / "records.jsonl"), event_class="mixed")
+    r = C8Actor().run(ctx)
+    assert r.status == "WARN"
+    assert any("softened" in f for f in r.findings)
+
+
+def test_c8_flags_actor_affected_collision_informationally():
+    # If actor and affected-entity resolution land on the same field, the
+    # source can't distinguish who acted from who was acted on -- reported
+    # as an informational finding, without changing the status.
+    ctx = _ctx(
+        str(FIXTURES / "simple" / "records.jsonl"),
+        event_class="activity",
+        affected_hints=["user"],
+    )
+    r = C8Actor().run(ctx)
+    assert r.status == "PASS"
+    assert any("cannot distinguish" in f for f in r.findings)

@@ -23,19 +23,23 @@ def build_ctx(
     affected_hints: list[str] | None = None,
     outcome_hints: list[str] | None = None,
     correlation_hints: list[str] | None = None,
+    actor_hints: list[str] | None = None,
     authoritative_over: list[str] | None = None,
     precedence_rules: list[PrecedenceRule] | None = None,
+    event_class: str | None = None,
     source_name: str = "src",
 ) -> CheckContext:
     origin_hints = origin_hints or []
     affected_hints = affected_hints or []
     outcome_hints = outcome_hints or []
     correlation_hints = correlation_hints or []
+    actor_hints = actor_hints or []
     source = SourceConfig(
         name=source_name,
         adapter="file",
         path=path,
         owner="ops@example.com",
+        event_class=event_class,
         authoritative_over=authoritative_over or [],
     )
     cfg = ScannerConfig(
@@ -49,6 +53,7 @@ def build_ctx(
             affected=affected_hints,
             outcome=outcome_hints,
             correlation=correlation_hints,
+            actor=actor_hints,
         ),
         sources=[source],
         precedence_rules=precedence_rules or [],

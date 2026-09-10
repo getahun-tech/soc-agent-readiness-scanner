@@ -39,6 +39,9 @@ sources:
   - name: ambiguous_nodedown
     adapter: file
     path: ./samples/ambiguous_nodedown/*.jsonl
+    # "Node Down" is a state event -- nothing *did* it, so there is no
+    # actor. Declaring state marks C8 not-applicable instead of failing.
+    event_class: state
     owner: "network-ops@example.com"
 
   - name: pii_proxy_logs
@@ -47,7 +50,9 @@ sources:
     # The proxy hosts aren't in the inventory, but the record content itself
     # (event type, timestamp, entities, outcome, correlation key) is fully
     # complete -- demonstrates a source that's completeness-strong even
-    # without inventory-backed attribution.
+    # without inventory-backed attribution. Proxy requests are user actions,
+    # so event_class: activity opts this source into C8 (actor) scoring.
+    event_class: activity
     owner: "web-proxy-team@example.com"
 
   - name: conflicting_pair_solarwinds

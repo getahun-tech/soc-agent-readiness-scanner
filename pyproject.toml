@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "event-log-completeness-scanner"
 version = "0.1.0"
-description = "Scores log/telemetry sources on the C1-C7 completeness checks and reports automation eligibility."
+description = "Scores log/telemetry sources on the C1-C8 completeness checks and reports automation eligibility."
 requires-python = ">=3.11"
 readme = "README.md"
 license = "MIT"

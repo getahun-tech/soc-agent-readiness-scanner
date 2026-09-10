@@ -10,6 +10,20 @@ from pydantic import BaseModel, Field, model_validator
 
 SampleStrategy = Literal["random", "recent", "stratified"]
 AdapterKind = Literal["file", "splunk", "sentinel", "elastic"]
+EventClass = Literal["activity", "state", "mixed"]
+"""What kind of events a source records, declared by its owner (C8):
+- "activity": someone/something performed an action (auth, file ops,
+  config changes) -- an actor/initiator field is expected, C8 is scored.
+- "state": something happened to a thing (down, degraded, threshold
+  crossed) -- there is no actor by definition, C8 is NOT_ASSESSED.
+- "mixed": both interleaved -- C8 is scored but FAIL is softened to WARN,
+  since partial actor absence is expected.
+Undeclared (None) means C8 runs advisory-only: it reports what it found
+but stays NOT_ASSESSED, so nothing false-fails out of the box. A missing
+actor field is ambiguous between "incomplete log" and "inapplicable
+concept" (a node-down event has no actor), and only the source owner
+knows which kind of source this is -- that's why this is declared, never
+inferred from the data."""
 
 
 class InventoryConfig(BaseModel):
@@ -18,7 +32,7 @@ class InventoryConfig(BaseModel):
 
 
 # Built-in field_hints defaults, so a config that omits field_hints entirely
-# still gets reasonable C4/C5/C7 behavior out of the box -- these are the
+# still gets reasonable C4/C5/C7/C8 behavior out of the box -- these are the
 # ONLY defaults FieldHints itself carries; C1's event-type candidates are
 # intentionally not field_hints-driven. An explicit `field_hints: {origin: []}`
 # (etc.) in a real YAML config still overrides these -- they're a starting
@@ -160,6 +174,43 @@ DEFAULT_OUTCOME_FIELD_CANDIDATES = [
     # AWS CloudTrail (presence/value indicates failure)
     "errorCode",
 ]
+DEFAULT_ACTOR_FIELD_CANDIDATES = [
+    # generic -- the account/identity that performed the action. Deliberately
+    # distinct from origin ("who reported it") and affected ("who it happened
+    # to"): reporter != actor != target, and C8 exists to keep them apart.
+    "user",
+    "username",
+    "user_name",
+    "actor",
+    "account",
+    "initiated_by",
+    "performed_by",
+    # Splunk CIM / CEF (suser = source user, sproc = source process)
+    "src_user",
+    "src_user_id",
+    "suser",
+    "sproc",
+    # ECS
+    "user.name",
+    "source.user.name",
+    "process.name",
+    # Sentinel ASIM
+    "ActorUsername",
+    "SrcUsername",
+    # Windows Security -- the *acting* account; TargetUserName is the
+    # acted-upon account and belongs in the affected list, not here.
+    "SubjectUserName",
+    # AWS CloudTrail
+    "userIdentity.userName",
+    "userIdentity.arn",
+    "userName",
+    # Linux auditd
+    "acct",
+    "auid",
+    # process-as-actor (endpoint/EDR telemetry)
+    "process_name",
+    "ProcessName",
+]
 DEFAULT_CORRELATION_FIELD_CANDIDATES = [
     # generic
     "session_id",
@@ -189,6 +240,7 @@ class FieldHints(BaseModel):
     affected: list[str] = Field(default_factory=lambda: list(DEFAULT_AFFECTED_FIELD_CANDIDATES))
     outcome: list[str] = Field(default_factory=lambda: list(DEFAULT_OUTCOME_FIELD_CANDIDATES))
     correlation: list[str] = Field(default_factory=lambda: list(DEFAULT_CORRELATION_FIELD_CANDIDATES))
+    actor: list[str] = Field(default_factory=lambda: list(DEFAULT_ACTOR_FIELD_CANDIDATES))
 
 
 class DefaultsConfig(BaseModel):
@@ -248,6 +300,8 @@ class SourceConfig(BaseModel):
     query: str | None = None
     index: str | None = None
     schema_: str | None = Field(default=None, alias="schema")
+    event_class: EventClass | None = None
+    """See EventClass. None (undeclared) keeps C8 advisory-only."""
     authoritative_over: list[str] = Field(default_factory=list)
     owner: str
     sample_size: int | None = None

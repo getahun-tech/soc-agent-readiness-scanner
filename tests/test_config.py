@@ -191,6 +191,43 @@ precedence_rules:
         load_config(p)
 
 
+def test_event_class_accepts_declared_values_and_defaults_to_none(tmp_path):
+    p = tmp_path / "config.yaml"
+    p.write_text("""
+version: "1.0"
+ruleset_version: "2026.07"
+sources:
+  - name: activity_src
+    adapter: file
+    path: ./a/*.log
+    event_class: activity
+    owner: "ops@example.com"
+  - name: undeclared_src
+    adapter: file
+    path: ./b/*.log
+    owner: "ops@example.com"
+""")
+    cfg = load_config(p)
+    assert cfg.sources[0].event_class == "activity"
+    assert cfg.sources[1].event_class is None
+
+
+def test_event_class_rejects_unknown_values(tmp_path):
+    p = tmp_path / "config.yaml"
+    p.write_text("""
+version: "1.0"
+ruleset_version: "2026.07"
+sources:
+  - name: src_a
+    adapter: file
+    path: ./a/*.log
+    event_class: telemetry
+    owner: "ops@example.com"
+""")
+    with pytest.raises(ValidationError):
+        load_config(p)
+
+
 def test_per_source_overrides_effective_sample_settings(tmp_path):
     p = tmp_path / "config.yaml"
     p.write_text("""

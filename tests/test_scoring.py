@@ -69,7 +69,34 @@ def test_completeness_score_always_excludes_c6_even_when_c6_passes():
     verdict = CompletenessScorer().score(_source(), _all_pass_checks())
     assert "C6" not in verdict.completeness.assessed_checks
     assert "C6" not in verdict.completeness.not_assessed_checks
+    # C8 isn't in the checks dict here, so it lands in not_assessed and
+    # stays out of the denominator.
+    assert "C8" in verdict.completeness.not_assessed_checks
     assert verdict.completeness.denominator == 6
+
+
+def test_c8_joins_the_denominator_only_when_assessed():
+    # NOT_ASSESSED C8 (undeclared/state source) stays out of the denominator...
+    checks = dict(_all_pass_checks())
+    checks["C8"] = _result("C8", "Actor / initiator", "NOT_ASSESSED", None)
+    verdict = CompletenessScorer().score(_source(), checks)
+    assert verdict.completeness.denominator == 6
+    assert "C8" in verdict.completeness.not_assessed_checks
+
+    # ...and a scored C8 (declared activity source) joins it.
+    checks["C8"] = _result("C8", "Actor / initiator", "PASS", 1.0)
+    verdict = CompletenessScorer().score(_source(), checks)
+    assert verdict.completeness.denominator == 7
+    assert "C8" in verdict.completeness.assessed_checks
+    assert verdict.completeness.score == 7.0
+
+
+def test_c8_never_gates_eligibility():
+    checks = dict(_all_pass_checks())
+    checks["C8"] = _result("C8", "Actor / initiator", "FAIL", 0.0)
+    verdict = evaluate_eligibility(_source(event_class="activity"), checks)
+    assert verdict.eligible is True
+    assert {g.gate_id for g in verdict.gates} == {"C2", "C4", "C5"}
 
 
 def test_score_always_returns_eligibility_too():

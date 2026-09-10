@@ -8,10 +8,10 @@ tribal knowledge. This tool answers it repeatably, against a bounded,
 read-only sample of each source, and produces a report with concrete
 evidence behind every finding.
 
-It scores every source against seven completeness checks (C1–C7, C6
-excluded from scoring — see below) and derives automation eligibility
-from a small, explicit set of gates — never a threshold on the overall
-score.
+It scores every source against eight completeness checks (C1–C8; C6 is
+advisory-only, and C8 is scored only when a source declares its
+`event_class` — see below) and derives automation eligibility from a
+small, explicit set of gates — never a threshold on the overall score.
 
 ## What this tool does not do
 
@@ -50,14 +50,14 @@ to its reporting device but never records who or what the event actually
 happened to:
 
 ```
-**Score:** 1.5/6 (25%) (C6 excluded)
+**Score:** 1.5/6 (25%) (C8 not assessed) (C6 excluded)
 
 **Automation eligibility:** NOT ELIGIBLE
 - C4 (affected entity identifiable): C4 is FAIL: no affected-entity
   identifier found: none of ['target', 'dst'] are present in the sample
   -- owner: network-ops@example.com
 
-**Completeness (C1-C7)**
+**Completeness (C1-C8)**
 
 - C4 -- Affected entity: FAIL
   - no affected-entity identifier found: none of ['target', 'dst'] are
@@ -74,7 +74,7 @@ attribution is flawless.
 
 ## The checks
 
-**Completeness (C1–C7)** — does each record carry enough information to
+**Completeness (C1–C8)** — does each record carry enough information to
 be useful? (C6 excluded from scoring — advisory only)
 
 | # | Name | What it checks |
@@ -86,6 +86,7 @@ be useful? (C6 excluded from scoring — advisory only)
 | C5 | Outcome | Is there a result/status/disposition field? |
 | C6 | Causality *(advisory, not scored)* | Is there a reason/cause field? Can never FAIL or block eligibility — only PASS or NOT_ASSESSED. |
 | C7 | Correlatability | Is there an explicit correlation key, or a composite key constructible from timestamp + an identifiable entity field? |
+| C8 | Actor / initiator *(scored only when `event_class` is declared)* | Who *performed* the action — the third entity alongside "who reported it" (origin) and "who it happened to" (C4). |
 
 A few checks carry design decisions worth knowing about beyond the table above:
 
@@ -98,6 +99,17 @@ A few checks carry design decisions worth knowing about beyond the table above:
   block eligibility — most telemetry records symptoms, not causes, and
   failing sources for lacking a causal field would fail nearly
   everything and train operators to ignore the report.
+- **C8 (actor/initiator)** completes the entity triad: *reporter ≠
+  actor ≠ target*. For identity-touching automations (disable an
+  account, kill a process) the actor is often the decision-critical
+  field — but a state event ("node down", "disk failed") has no actor
+  by definition, and no amount of sampling can distinguish "incomplete
+  log" from "inapplicable concept." So applicability is declared, never
+  inferred: set `event_class: activity` (scored), `state` (not
+  applicable), or `mixed` (scored, FAIL softened to WARN) per source.
+  Undeclared sources get an advisory-only C8 that reports what it found
+  without scoring — nothing false-fails out of the box. C8 never gates
+  eligibility; the gate set stays frozen at C2/C4/C5.
 - Every check evidences its findings with concrete counts, percentages,
   or examples. "Attribution could be improved" is not acceptable output
   from this tool; "67% of records could not be attributed to a known

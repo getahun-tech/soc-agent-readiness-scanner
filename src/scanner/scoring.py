@@ -1,7 +1,7 @@
 """Completeness scoring and automation-eligibility gating.
 
-One score per source, computed from the fixed C1-C7 (minus C6, see below)
-denominator. Eligibility is a named list of gates, not a threshold on the
+One score per source, computed from the fixed C1-C8 (minus C6, see below)
+check list. Eligibility is a named list of gates, not a threshold on the
 score: a source can score 6/6 and still be correctly ineligible if a
 specific gate (e.g. C4) fails, because the gate list names C4 specifically.
 """
@@ -13,12 +13,15 @@ from pydantic import BaseModel, computed_field
 from scanner.checks.base import CheckResult
 from scanner.config import SourceConfig
 
-# Fixed 6-check denominator. C6 is excluded outright -- not just when
-# NOT_ASSESSED, always.
-COMPLETENESS_CHECK_IDS = ["C1", "C2", "C3", "C4", "C5", "C7"]
+# C6 is excluded outright -- not just when NOT_ASSESSED, always. C8 is in
+# the list but only counts toward the denominator when it was actually
+# assessed (its source declared an event_class), since NOT_ASSESSED checks
+# are excluded from the denominator dynamically below.
+COMPLETENESS_CHECK_IDS = ["C1", "C2", "C3", "C4", "C5", "C7", "C8"]
 
 # (gate_id, description) for the simple "must be PASS" gates. C5 has its
-# own special-cased PASS_OR_WARN condition, handled separately.
+# own special-cased PASS_OR_WARN condition, handled separately. The gate
+# set is deliberately frozen at C2/C4/C5 -- C8 never gates.
 _STRICT_PASS_GATES: list[tuple[str, str]] = [
     ("C2", "temporal quality sound"),
     ("C4", "affected entity identifiable"),

@@ -9,7 +9,9 @@
 {{ dim.score }}/{{ dim.denominator }}{% if dim.percent is not none %} ({{ dim.percent }}%){% endif %}{% if dim.not_assessed_checks %} ({{ dim.not_assessed_checks | join(', ') }} not assessed){% endif %}
 {%- endmacro -%}
 {%- macro records_failed_line(c) -%}
-{%- if c.records_total %}  - **{{ c.records_failed }}/{{ c.records_total }} logs failed this check ({{ c.records_failed_percent }}%)**{% endif -%}
+{#- A NOT_ASSESSED check didn't judge any records, so a "failed" count
+    would contradict its own status -- suppress the line. -#}
+{%- if c.records_total and c.status != "NOT_ASSESSED" %}  - **{{ c.records_failed }}/{{ c.records_total }} logs failed this check ({{ c.records_failed_percent }}%)**{% endif -%}
 {%- endmacro -%}
 # Event Log Completeness Scanner Report
 
@@ -63,12 +65,12 @@
 {% endif %}
 
 {% if s.checks -%}
-**Completeness (C1-C7)**
+**Completeness (C1-C8)**
 
 {% for c in s.checks %}
 - **{{ c.check_id }} -- {{ c.name }}**: {{ status_badge(c.status) }}
-{{ records_failed_line(c) }}
-{% for f in c.findings %}
+{% if c.records_total and c.status != "NOT_ASSESSED" %}{{ records_failed_line(c) }}
+{% endif %}{% for f in c.findings %}
   - {{ f }}
 {% endfor -%}
 {% endfor -%}

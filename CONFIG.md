@@ -16,7 +16,7 @@ example against the bundled samples.
 | `ruleset_version` | string | yes | Your own version label for this ruleset/config generation (informational; recorded in run metadata and the run journal). |
 | `inventory` | [InventoryConfig](#inventory) | no | Asset inventory used by origin resolution and C4. Omitting it is valid — without it, origin resolution assumes a field's presence is truthful rather than verifying it against known assets; with it, an actual match is required for the `attributable_rate` figure the eligibility gates use. |
 | `defaults` | [DefaultsConfig](#defaults) | no | Default sampling behavior, overridable per source. |
-| `field_hints` | [FieldHints](#field_hints) | no | Candidate field names checks use to locate origin/affected/outcome/correlation fields. |
+| `field_hints` | [FieldHints](#field_hints) | no | Candidate field names checks use to locate origin/affected/outcome/correlation/actor fields. |
 | `sources` | list of [SourceConfig](#sources) | yes | The sources to scan. Names must be unique. |
 | `precedence_rules` | list of [PrecedenceRule](#precedence_rules) | no | Declares which source wins when two sources describe the same entities (used by the missing-precedence-rule conflict check). |
 | `splunk` | [SplunkConnectionConfig](#splunk) | conditionally | Connection details shared by every `adapter: splunk` source. **Required** if any source uses `adapter: splunk`; the config is rejected at validation time otherwise. |
@@ -65,6 +65,7 @@ field_hints:
   affected: [dest, dst, target, subject, user, resource]
   outcome: [action, result, status, disposition]
   correlation: [session_id, trace_id, flow_id, transaction_id]
+  actor: [user, src_user, SubjectUserName]
 ```
 
 Ordered candidate field names. C5's outcome field and C7's correlation
@@ -81,11 +82,11 @@ clock-skew grouping, C4's same-field-as-origin distinguishability
 check). Either way, hints don't force a field to be used — they just
 tell each check where to look first.
 
-**All four lists have built-in defaults** (below), so omitting
-`field_hints` entirely still gives C4/C5/C7 (and origin resolution
+**All five lists have built-in defaults** (below), so omitting
+`field_hints` entirely still gives C4/C5/C7/C8 (and origin resolution
 generally) something reasonable to look for on a fresh install, before
 you've tuned anything for your own log field names. Specifying
-`field_hints` in your config — even just one of the four lists —
+`field_hints` in your config — even just one of the five lists —
 **replaces** that list's default outright (it doesn't merge with it),
 so include the names you still want alongside your own:
 
@@ -95,6 +96,7 @@ field_hints:
   affected: [dest, dst, target, subject, user, resource]
   outcome: [action, result, status, disposition]
   correlation: [session_id, trace_id, flow_id, transaction_id]
+  actor: [user, src_user, SubjectUserName]
 ```
 
 The built-in defaults are drawn from the field-naming conventions of
@@ -122,6 +124,7 @@ which device reported it.
 | `affected` | `dst`, `dest`, `destination`, `target`, `subject`, `user`, `resource`, `dest_ip`, `dest_nt_host`, `dest_user`, `dstip`, `dhost`, `duser`, `destination.ip`, `destination.hostname`, `related.hosts`, `Dst`, `DstHostname`, `DstIpAddr`, `DstUsername`, `TargetHostname`, `TargetUserName`, `TargetDomainName`, `DestinationIp`, `DestinationHostname`, `dst_endpoint` |
 | `outcome` | `action`, `result`, `status`, `disposition`, `outcome`, `state`, `act`, `EventResult`, `DvcAction`, `event.outcome`, `event.action`, `status_id`, `disposition_id`, `errorCode` |
 | `correlation` | `session_id`, `transaction_id`, `trace_id`, `flow_id`, `request_id`, `correlation_id`, `span_id`, `SessionId`, `NetworkSessionId`, `EventUid`, `requestID`, `requestId`, `ActivityId`, `ProcessGuid`, `externalId` |
+| `actor` | `user`, `username`, `user_name`, `actor`, `account`, `initiated_by`, `performed_by`, `src_user`, `src_user_id`, `suser`, `sproc`, `user.name`, `source.user.name`, `process.name`, `ActorUsername`, `SrcUsername`, `SubjectUserName`, `userIdentity.userName`, `userIdentity.arn`, `userName`, `acct`, `auid`, `process_name`, `ProcessName` |
 
 (C1's event-type candidates are intentionally *not*
 `field_hints`-driven.)
@@ -168,6 +171,7 @@ sources:
 | `query` | string | if `adapter: splunk`, `sentinel`, or `elastic` | The query, in that backend's own language: SPL for Splunk, KQL for Sentinel, a Lucene `query_string` for Elastic. A bounding clause (`\| head N` / `\| take N` / `size`) is appended automatically; you don't need to add one. |
 | `index` | string | if `adapter: elastic` | Index or index pattern to search, e.g. `logs-firewall-*`. Not used by other adapters. |
 | `schema` | string | no | Declared schema name (e.g. a CIM data model). Informational; not currently enforced by any check. (YAML key is `schema`; the Python field is `schema_` since `schema` collides with pydantic internals — either key works when loading YAML.) |
+| `event_class` | `activity` \| `state` \| `mixed` | no | What kind of events this source records, for C8 (actor/initiator). `activity` (auth, file ops, config changes — an actor is expected): C8 is scored. `state` (down, degraded, threshold crossed — no actor exists by definition): C8 reports NOT_ASSESSED. `mixed`: C8 is scored but FAIL softens to WARN. Undeclared: C8 runs advisory-only — it reports what it found but never scores or fails. Declared, never inferred, because a missing actor field is ambiguous between "incomplete log" and "not applicable," and only the source owner knows which. |
 | `authoritative_over` | list of string | no (default `[]`) | Other source names this source is authoritative over, for the missing-precedence-rule conflict check. |
 | `owner` | string | yes | Email/identity that owns fixes for this source. Used to route recommendations and eligibility-gate failures. |
 | `sample_size` | int | no | Overrides `defaults.sample_size` for this source only. |
