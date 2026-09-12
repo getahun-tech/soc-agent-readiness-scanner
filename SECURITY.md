@@ -69,11 +69,19 @@ tool output, or in a log line — including error/debug output.
 
 All three remote adapters follow the same pattern: a credential read
 from an environment variable named by a config field
-(`splunk.token_env_var` default `SPLUNK_TOKEN`,
+(`splunk.token_env_var` default `SPLUNK_TOKEN` — or, under
+`splunk.auth: session`, `username_env_var`/`password_env_var` —
 `sentinel.client_secret_env_var` default `SENTINEL_CLIENT_SECRET`,
 `elastic.api_key_env_var` default `ELASTIC_API_KEY`), and no field in
 any of the three connection config schemas for the credential itself —
 there is nothing to accidentally commit.
+
+Splunk's session-auth fallback holds the password in a credential
+object whose `repr` is redacted, so even a careless interpolation into
+an error message can't echo it; the scrub layer below strips both the
+token and the password from any exception text. The read-only
+capability check is auth-agnostic: an admin password gets exactly as far
+as an admin token, which is to say refused before the first search.
 
 Each adapter's `fetch_sample()` wraps its call into the connection
 factory in a try/except that scrubs the credential out of the exception

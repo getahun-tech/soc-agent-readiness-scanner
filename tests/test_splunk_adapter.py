@@ -8,8 +8,9 @@ guards).
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
-from scanner.adapters.splunk import SplunkAdapter, _build_spl, _map_parsed_fields
+from scanner.adapters.splunk import SplunkAdapter, SplunkCredential, _build_spl, _map_parsed_fields
 from scanner.config import DefaultsConfig, ScannerConfig, SourceConfig, SplunkConnectionConfig
 from scanner.exceptions import AdapterError
 
@@ -44,7 +45,9 @@ def _fake_events(n: int, *, source_field: str | None = None) -> list[dict]:
     return events
 
 
-def _config(*, sample_size=3, sample_strategy="recent", seed=1, token_env_var="SPLUNK_TOKEN") -> tuple[ScannerConfig, SourceConfig]:
+def _config(
+    *, sample_size=3, sample_strategy="recent", seed=1, token_env_var="SPLUNK_TOKEN", auth="token"
+) -> tuple[ScannerConfig, SourceConfig]:
     source = SourceConfig(
         name="splunk_src",
         adapter="splunk",
@@ -55,7 +58,7 @@ def _config(*, sample_size=3, sample_strategy="recent", seed=1, token_env_var="S
         version="1.0",
         ruleset_version="test",
         defaults=DefaultsConfig(sample_size=sample_size, sample_strategy=sample_strategy, seed=seed),
-        splunk=SplunkConnectionConfig(host="splunk.example.com", token_env_var=token_env_var),
+        splunk=SplunkConnectionConfig(host="splunk.example.com", token_env_var=token_env_var, auth=auth),
         sources=[source],
     )
     return cfg, source
@@ -68,7 +71,7 @@ def test_missing_token_env_var_raises_without_connecting(monkeypatch):
     monkeypatch.delenv("SPLUNK_TOKEN", raising=False)
     cfg, source = _config()
     called = []
-    adapter = SplunkAdapter(connection_factory=lambda conn, token: called.append(token))
+    adapter = SplunkAdapter(connection_factory=lambda conn, credential: called.append(credential))
 
     with pytest.raises(AdapterError, match="SPLUNK_TOKEN"):
         adapter.fetch_sample(source, cfg)
@@ -79,13 +82,116 @@ def test_token_value_never_appears_in_error_message(monkeypatch):
     monkeypatch.setenv("SPLUNK_TOKEN", "super-secret-token-value")
     cfg, source = _config()
 
-    def _boom(conn, token):
-        raise RuntimeError(f"connect failed for token {token}")  # simulate a leaky underlying lib
+    def _boom(conn, credential):
+        # simulate a leaky underlying lib that echoes the raw secret
+        raise RuntimeError(f"connect failed for token {credential.token}")
 
     adapter = SplunkAdapter(connection_factory=_boom)
     with pytest.raises(Exception) as exc_info:
         adapter.fetch_sample(source, cfg)
     assert "super-secret-token-value" not in str(exc_info.value)
+    assert "***REDACTED***" in str(exc_info.value)
+
+
+def test_token_auth_ignores_session_env_vars(monkeypatch):
+    monkeypatch.setenv("SPLUNK_TOKEN", "tok")
+    monkeypatch.setenv("SPLUNK_USERNAME", "should-not-be-read")
+    monkeypatch.setenv("SPLUNK_PASSWORD", "should-not-be-read")
+    cfg, source = _config()
+    seen = []
+    fake = FakeSplunkConnection(_fake_events(3))
+
+    def _factory(conn, credential):
+        seen.append(credential)
+        return fake
+
+    SplunkAdapter(connection_factory=_factory).fetch_sample(source, cfg)
+    assert seen[0].kind == "token"
+    assert seen[0].token == "tok"
+    assert seen[0].username is None and seen[0].password is None
+
+
+# --- session auth: explicit fallback (sec 9.4) ------------------------------
+
+
+def test_session_auth_requires_both_env_vars_and_names_the_missing_ones(monkeypatch):
+    monkeypatch.delenv("SPLUNK_USERNAME", raising=False)
+    monkeypatch.delenv("SPLUNK_PASSWORD", raising=False)
+    cfg, source = _config(auth="session")
+    called = []
+    adapter = SplunkAdapter(connection_factory=lambda conn, credential: called.append(credential))
+
+    with pytest.raises(AdapterError, match="SPLUNK_USERNAME.*SPLUNK_PASSWORD"):
+        adapter.fetch_sample(source, cfg)
+    assert called == []
+
+    # Username alone isn't enough either -- and the message names only the gap.
+    monkeypatch.setenv("SPLUNK_USERNAME", "scanner_ro")
+    with pytest.raises(AdapterError, match="SPLUNK_PASSWORD") as exc_info:
+        adapter.fetch_sample(source, cfg)
+    assert "SPLUNK_USERNAME" not in str(exc_info.value)
+    assert called == []
+
+
+def test_session_auth_reads_username_and_password_and_proceeds(monkeypatch):
+    monkeypatch.delenv("SPLUNK_TOKEN", raising=False)  # token must not be required here
+    monkeypatch.setenv("SPLUNK_USERNAME", "scanner_ro")
+    monkeypatch.setenv("SPLUNK_PASSWORD", "s3cret")
+    cfg, source = _config(auth="session", sample_size=2)
+    seen = []
+    fake = FakeSplunkConnection(_fake_events(5))
+
+    def _factory(conn, credential):
+        seen.append(credential)
+        return fake
+
+    records, _ = SplunkAdapter(connection_factory=_factory).fetch_sample(source, cfg)
+    assert len(list(records)) == 2
+    assert seen[0].kind == "session"
+    assert seen[0].username == "scanner_ro"
+    assert seen[0].password == "s3cret"
+    assert seen[0].token is None
+
+
+def test_session_password_never_appears_in_error_message(monkeypatch):
+    monkeypatch.setenv("SPLUNK_USERNAME", "scanner_ro")
+    monkeypatch.setenv("SPLUNK_PASSWORD", "super-secret-password")
+    cfg, source = _config(auth="session")
+
+    def _boom(conn, credential):
+        raise RuntimeError(f"login failed for {credential.username}/{credential.password}")
+
+    with pytest.raises(Exception) as exc_info:
+        SplunkAdapter(connection_factory=_boom).fetch_sample(source, cfg)
+    assert "super-secret-password" not in str(exc_info.value)
+    assert "scanner_ro" in str(exc_info.value)  # the username is not a secret
+
+
+def test_session_auth_still_refuses_write_capable_accounts(monkeypatch):
+    # The read-only gate is auth-agnostic: an admin password gets exactly
+    # as far as an admin token, i.e. refused before any search runs.
+    monkeypatch.setenv("SPLUNK_USERNAME", "admin")
+    monkeypatch.setenv("SPLUNK_PASSWORD", "hunter2")
+    cfg, source = _config(auth="session")
+    fake = FakeSplunkConnection(_fake_events(5), capabilities={"search", "edit_forwarders"})
+
+    with pytest.raises(AdapterError, match="edit_forwarders"):
+        SplunkAdapter(connection_factory=lambda conn, credential: fake).fetch_sample(source, cfg)
+    assert fake.search_calls == []
+
+
+def test_credential_repr_is_redacted():
+    cred = SplunkCredential(kind="session", username="scanner_ro", password="s3cret")
+    assert "s3cret" not in repr(cred)
+    assert "s3cret" not in str(cred)
+    assert "scanner_ro" in repr(cred)
+    assert SplunkCredential(kind="token", token="tok").secrets() == ["tok"]
+    assert cred.secrets() == ["s3cret"]
+
+
+def test_splunk_auth_rejects_unknown_kinds():
+    with pytest.raises(ValidationError):
+        SplunkConnectionConfig(host="splunk.example.com", auth="basic")
 
 
 def test_missing_splunk_connection_config_raises():

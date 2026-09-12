@@ -215,6 +215,7 @@ splunk:
   host: "splunk.example.com"
   port: 8089
   scheme: https
+  auth: token                 # token (default, preferred) | session
   token_env_var: SPLUNK_TOKEN
   verify_ssl: true
 ```
@@ -224,13 +225,34 @@ splunk:
 | `host` | string | — (required) | Splunk management host. |
 | `port` | int | `8089` | Splunk management port. |
 | `scheme` | `https` \| `http` | `https` | Connection scheme. |
-| `token_env_var` | string | `SPLUNK_TOKEN` | Name of the **environment variable** the auth token is read from at scan time. |
+| `auth` | `token` \| `session` | `token` | How to authenticate. `token` sends a JWT authentication token as a Bearer header. `session` logs in with a username and password and holds the resulting session key. See below for why `token` is the default. |
+| `token_env_var` | string | `SPLUNK_TOKEN` | `auth: token` only. Name of the **environment variable** the token is read from at scan time. |
+| `username_env_var` | string | `SPLUNK_USERNAME` | `auth: session` only. Environment variable holding the username. |
+| `password_env_var` | string | `SPLUNK_PASSWORD` | `auth: session` only. Environment variable holding the password. |
 | `verify_ssl` | bool | `true` | TLS certificate verification. |
 
-There is deliberately no `token` field. Splunk credentials must come
-from the environment (or a secrets manager that populates the
+There is deliberately no `token` or `password` field. Splunk credentials
+must come from the environment (or a secrets manager that populates the
 environment), never from a config file — see
 [SECURITY.md](SECURITY.md#credential-handling).
+
+**Token vs. session.** Prefer `token`: a leaked token is search access
+until it expires or you revoke it from *Settings › Tokens*, and revoking
+it doesn't touch the account. A leaked password is the whole account —
+Splunk Web, password changes, everything that user can do — and rotating
+it breaks whatever else uses it. `session` exists as an explicit
+fallback for installs where token auth is broken (some Splunk builds
+reject tokens they issued themselves). If you use it:
+
+1. Create a **dedicated read-only user** for the scanner, with a role
+   that has search on the target indexes and nothing else. Never `admin`
+   and never a person's account — the capability check refuses any
+   account with write-capable permissions before the first search, so
+   `admin` would be rejected anyway, but don't rely on that to protect
+   the password.
+2. Set both variables in the shell for that session only, e.g. in
+   PowerShell `$env:SPLUNK_PASSWORD = Read-Host -AsSecureString | ConvertFrom-SecureString -AsPlainText`,
+   so the password never lands in a file or a shell history.
 
 ## `sentinel`
 

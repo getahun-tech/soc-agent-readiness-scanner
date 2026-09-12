@@ -249,19 +249,33 @@ class DefaultsConfig(BaseModel):
     seed: int = 42
 
 
+SplunkAuth = Literal["token", "session"]
+
+
 class SplunkConnectionConfig(BaseModel):
     """Connection details for every `adapter: splunk` source in this config.
 
-    Never a credential itself -- `token_env_var` names an environment
-    variable the token is read from at scan time (SPEC.md sec 9.4). A
-    literal token here would be rejected the same way any other field
-    would be, but there is deliberately no `token` field to put one in.
+    Never a credential itself -- every `*_env_var` field names an
+    environment variable the secret is read from at scan time. There is
+    deliberately no `token` or `password` field to put one in.
+
+    `auth: token` (default, preferred) reads a JWT authentication token
+    from `token_env_var`. `auth: session` reads a username and password
+    from `username_env_var`/`password_env_var` and logs in for a session
+    key -- an explicit fallback for installs where token auth is broken,
+    not an equal alternative: a leaked token is search access until it
+    expires or is revoked; a leaked password is the whole account. Use it
+    only with a dedicated read-only user (the capability check refuses
+    write-capable accounts either way, so `admin` won't get past it).
     """
 
     host: str
     port: int = 8089
     scheme: Literal["https", "http"] = "https"
+    auth: SplunkAuth = "token"
     token_env_var: str = "SPLUNK_TOKEN"
+    username_env_var: str = "SPLUNK_USERNAME"
+    password_env_var: str = "SPLUNK_PASSWORD"
     verify_ssl: bool = True
 
 

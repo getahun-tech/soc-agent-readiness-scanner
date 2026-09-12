@@ -13,7 +13,8 @@ from __future__ import annotations
 
 import os
 from collections.abc import Callable, Iterator
-from typing import Any, Protocol
+from dataclasses import dataclass
+from typing import Any, Literal, Protocol
 
 from scanner.adapters.base import Adapter
 from scanner.config import ScannerConfig, SourceConfig, SplunkConnectionConfig
@@ -52,27 +53,90 @@ class SplunkConnection(Protocol):
     def capabilities(self) -> set[str]: ...
 
 
+@dataclass(frozen=True, repr=False)
+class SplunkCredential:
+    """What `fetch_sample` read from the environment, handed to the
+    connection factory. Its repr is redacted so it can be interpolated
+    into an error message without leaking, and `secrets()` is the list
+    the scrub layer strips from any exception text that does."""
+
+    kind: Literal["token", "session"]
+    token: str | None = None
+    username: str | None = None
+    password: str | None = None
+
+    def secrets(self) -> list[str]:
+        return [s for s in (self.token, self.password) if s]
+
+    def __repr__(self) -> str:
+        return f"SplunkCredential(kind={self.kind!r}, username={self.username!r}, <secrets redacted>)"
+
+
+def _read_credential(conn: SplunkConnectionConfig, source_name: str) -> SplunkCredential:
+    if conn.auth == "token":
+        token = os.environ.get(conn.token_env_var)
+        if not token:
+            raise AdapterError(
+                f"source '{source_name}': environment variable '{conn.token_env_var}' is not "
+                f"set -- Splunk credentials must come from the environment, never from config "
+                f"(SPEC.md sec 9.4)"
+            )
+        return SplunkCredential(kind="token", token=token)
+
+    username = os.environ.get(conn.username_env_var)
+    password = os.environ.get(conn.password_env_var)
+    missing = [
+        name for name, value in ((conn.username_env_var, username), (conn.password_env_var, password))
+        if not value
+    ]
+    if missing:
+        raise AdapterError(
+            f"source '{source_name}': environment variable(s) {missing} not set -- "
+            f"`auth: session` needs both a username and a password, read from the "
+            f"environment, never from config (SPEC.md sec 9.4)"
+        )
+    return SplunkCredential(kind="session", username=username, password=password)
+
+
 class RealSplunkConnection:
-    def __init__(self, *, host: str, port: int, scheme: str, token: str, verify_ssl: bool):
+    def __init__(
+        self,
+        *,
+        host: str,
+        port: int,
+        scheme: str,
+        verify_ssl: bool,
+        token: str | None = None,
+        username: str | None = None,
+        password: str | None = None,
+    ):
         from splunklib import client  # optional extra: pip install -e ".[splunk]"
 
-        try:
+        if token is not None:
             # `splunkToken`, not `token` -- splunklib sends `token=` as a legacy
             # session key (`Authorization: Splunk <value>`), which Splunk's
             # REST API rejects for a JWT from Settings > Tokens ("Session is
             # not logged in"). `splunkToken` is what routes through the
             # Bearer-auth path (`Authorization: Bearer <value>`) that a JWT
             # authentication token actually needs.
+            auth_kwargs: dict[str, Any] = {"splunkToken": token}
+        else:
+            # Session auth: splunklib POSTs to /services/auth/login once and
+            # holds the resulting session key; the password itself is used
+            # for that single exchange and never sent again.
+            auth_kwargs = {"username": username, "password": password}
+
+        try:
             self._service = client.connect(
                 host=host,
                 port=port,
                 scheme=scheme,
-                splunkToken=token,
                 verify=verify_ssl,
                 autologin=False,
+                **auth_kwargs,
             )
         except Exception as exc:
-            # `token` must never appear in this message (SPEC.md sec 9.4).
+            # No credential may appear in this message (SPEC.md sec 9.4).
             raise AdapterError(f"failed to connect to Splunk at {scheme}://{host}:{port}") from exc
 
     def capabilities(self) -> set[str]:
@@ -97,12 +161,20 @@ class RealSplunkConnection:
             job.cancel()
 
 
-ConnectionFactory = Callable[[SplunkConnectionConfig, str], SplunkConnection]
+ConnectionFactory = Callable[[SplunkConnectionConfig, SplunkCredential], SplunkConnection]
 
 
-def _default_connection_factory(conn: SplunkConnectionConfig, token: str) -> SplunkConnection:
+def _default_connection_factory(
+    conn: SplunkConnectionConfig, credential: SplunkCredential
+) -> SplunkConnection:
     return RealSplunkConnection(
-        host=conn.host, port=conn.port, scheme=conn.scheme, token=token, verify_ssl=conn.verify_ssl
+        host=conn.host,
+        port=conn.port,
+        scheme=conn.scheme,
+        verify_ssl=conn.verify_ssl,
+        token=credential.token,
+        username=credential.username,
+        password=credential.password,
     )
 
 
@@ -150,23 +222,20 @@ class SplunkAdapter(Adapter):
                 f"connection block in config"
             )
 
-        token = os.environ.get(config.splunk.token_env_var)
-        if not token:
-            raise AdapterError(
-                f"source '{source.name}': environment variable '{config.splunk.token_env_var}' "
-                f"is not set -- Splunk credentials must come from the environment, never from "
-                f"config (SPEC.md sec 9.4)"
-            )
+        credential = _read_credential(config.splunk, source.name)
 
         try:
-            connection = self._connection_factory(config.splunk, token)
-        except Exception as exc:  # noqa: BLE001 -- must scrub the token before this propagates at all
+            connection = self._connection_factory(config.splunk, credential)
+        except Exception as exc:  # noqa: BLE001 -- must scrub the secrets before this propagates at all
             # Scrub defensively and break the exception chain (`from None`):
             # a custom connection_factory's own exception text -- or its
             # traceback via __cause__ -- could otherwise still carry the
-            # token even though RealSplunkConnection itself is careful not
-            # to (sec 9.4: never log credential values, including debug output).
-            message = str(exc).replace(token, "***REDACTED***")
+            # token or password even though RealSplunkConnection itself is
+            # careful not to (sec 9.4: never log credential values,
+            # including debug output).
+            message = str(exc)
+            for secret in credential.secrets():
+                message = message.replace(secret, "***REDACTED***")
             raise AdapterError(
                 f"source '{source.name}': failed to establish a Splunk connection: {message}"
             ) from None
