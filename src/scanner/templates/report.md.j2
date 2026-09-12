@@ -94,10 +94,18 @@ No conflicts detected.
 
 ## Recommendations
 
+Each item says what is missing, then what to add, the decision that
+unlocks for an automation, and where the fix realistically lives.
+ADVISORY items are not deficiencies -- they are context fields an agent
+needs to act *safely*, and they come from enrichment, not the device.
+
 {% if recommendations -%}
 {% for r in recommendations -%}
 - **[{{ r.status }}] {{ r.source }} / {{ r.check_id }} ({{ r.check_name }})** -- owner: {{ r.owner }} -- {{ r.finding }}
-{% endfor %}
+{% if r.remediation %}  - Add: {{ r.remediation.add_fields | join('; ') }}
+  - Enables: {{ r.remediation.enables }}
+  - Where: {{ r.remediation.where_labels | join('; ') }}
+{% endif %}{% endfor %}
 {% else -%}
 None.
 {% endif %}

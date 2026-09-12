@@ -124,6 +124,39 @@ the one miss is a gated check — `skewed_clocks` in the bundled demo
 scores 5.0/6 but is ineligible on C2 alone, proving this is possible,
 not just permitted.
 
+## Agent-readiness recommendations
+
+The checks say what is missing. The report's Recommendations section
+says what to do about it: for every FAIL or WARN, **what field to add**,
+**the decision it enables** for an automation, and — the part that
+makes it actionable — **where the fix realistically lives**, since
+engineers usually can't change a vendor's log format:
+
+```
+- [FAIL] origin_only_logs / C4 (Affected entity) -- owner: network-ops@example.com
+  -- no affected-entity identifier found: none of ['target', 'dst'] are present
+  - Add: dst / target / TargetUserName -- a field naming what the event happened
+    to, distinct from the device that reported it
+  - Enables: the agent knows what to act on, not only what reported it
+  - Where: device/application logging configuration (vendor side); ingest-time
+    enrichment or normalization (SIEM pipeline, Cribl, lookup)
+```
+
+C2 reads its own evidence and recommends only what that source needs —
+an explicit UTC offset, an ingest-time field, or clock synchronization
+rather than any new field at all.
+
+Each source also gets one **ADVISORY** line if it lacks the context
+fields an agent needs to act *safely*: a `maintenance_window` flag (so
+it doesn't "remediate" a host that is intentionally down), an
+`environment` tag (prod vs. dev), and `asset_criticality`. These are
+never scored — they aren't completeness deficiencies, and they almost
+never come from the device. They come from the asset inventory or the
+change calendar, via enrichment.
+
+Recommendations are additive. They never feed scores or gates, so they
+can't turn into requirements by the back door.
+
 ## Configuration
 
 See [CONFIG.md](CONFIG.md) for the full reference. `scanner

@@ -131,6 +131,7 @@ def run_scan(
                 checks=checks,
                 verdict=verdict,
                 origin_values=origin_values,
+                field_names=set(profile.field_stats),
             )
         )
 

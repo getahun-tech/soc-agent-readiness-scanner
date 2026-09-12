@@ -53,6 +53,11 @@ def test_run_scan_wires_completeness_checks_for_file_sources():
     assert result["estate_summary"]["ineligible_count"] == 1
     assert isinstance(result["conflicts"], list)
     assert isinstance(result["recommendations"], list)
+    # Recommendations serialize with their remediation, so JSON consumers
+    # get the playbook too, not just the finding text.
+    c2 = next(r for r in result["recommendations"] if r["check_id"] == "C2")
+    assert c2["remediation"]["add_fields"] and c2["remediation"]["where"]
+    assert result["recommendations"][-1]["check_id"] == "CTX"
 
 
 def _export_config(**source_kwargs) -> ScannerConfig:

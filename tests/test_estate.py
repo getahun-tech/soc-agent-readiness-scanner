@@ -136,3 +136,48 @@ def test_recommendations_never_include_c6():
     entry = _entry("src_a", checks=_all_pass_checks({"C6": _result("C6", "NOT_ASSESSED")}))
     recs = build_recommendations([entry])
     assert all(r.check_id != "C6" for r in recs)
+
+
+def test_recommendations_carry_playbook_remediation():
+    entry = _entry("src_a", checks=_all_pass_checks({"C4": _result("C4", "FAIL", ["no target"])}))
+    recs = build_recommendations([entry])
+    c4 = next(r for r in recs if r.check_id == "C4")
+    assert c4.remediation is not None
+    assert any("dst" in f for f in c4.remediation.add_fields)
+    assert "what to act on" in c4.remediation.enables
+    assert c4.remediation.where[0] == "device"
+
+
+def test_context_advisory_emitted_once_per_source_and_ordered_last():
+    entry = _entry(
+        "src_a",
+        checks=_all_pass_checks({"C1": _result("C1", "WARN"), "C3": _result("C3", "FAIL")}),
+    )
+    entry = entry.model_copy(update={"field_names": {"host", "action", "timestamp"}})
+    recs = build_recommendations([entry])
+
+    assert [r.status for r in recs] == ["FAIL", "WARN", "ADVISORY"]
+    ctx = recs[-1]
+    assert ctx.check_id == "CTX"
+    assert "maintenance_window" in ctx.finding and "asset_criticality" in ctx.finding
+    assert ctx.remediation.where == ["pipeline", "query"]
+    assert ctx.owner == "src_a-ops@example.com"
+
+
+def test_context_advisory_names_only_missing_fields_and_is_silent_when_all_present():
+    partial = _entry("src_a").model_copy(update={"field_names": {"host", "environment"}})
+    ctx = next(r for r in build_recommendations([partial]) if r.check_id == "CTX")
+    assert "environment" not in ctx.finding
+    assert "maintenance_window" in ctx.finding
+
+    complete = _entry("src_b").model_copy(
+        update={"field_names": {"host", "env", "in_maintenance", "asset_tier"}}
+    )
+    assert build_recommendations([complete]) == []
+
+
+def test_context_advisory_skipped_when_no_fields_were_observed():
+    # A source with no parsed fields at all (empty sample) has bigger
+    # problems; an advisory about context fields would be noise.
+    entry = _entry("src_a")  # field_names defaults to empty
+    assert [r for r in build_recommendations([entry]) if r.check_id == "CTX"] == []

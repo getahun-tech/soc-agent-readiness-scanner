@@ -47,6 +47,10 @@
   .badge.warn { background: var(--warn); }
   .badge.fail { background: var(--fail); }
   .badge.not-assessed { background: var(--na); }
+  .badge.advisory { background: var(--na); }
+  .rec .remediation { margin: 0.35rem 0 0 0; padding: 0; list-style: none; color: var(--fg); }
+  .rec .remediation li { margin: 0.1rem 0; }
+  .rec .remediation .k { font-weight: 600; color: var(--muted); }
   .source { border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; }
   .source-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
   .source-head h3 { margin: 0; }
@@ -160,10 +164,19 @@
   {% endif %}
 
   <h2>Recommendations</h2>
+  <p class="meta">Each item says what is missing, then what to add, the decision that unlocks for an automation, and where the fix realistically lives. ADVISORY items are not deficiencies &mdash; they are context fields an agent needs to act <em>safely</em>, and they come from enrichment, not the device.</p>
   {% if recommendations %}
     {% for r in recommendations %}
     <div class="rec">{{ badge(r.status) }} <strong>{{ r.source }}</strong> / {{ r.check_id }} ({{ r.check_name }})<br>
-      <span class="owner">owner: {{ r.owner }}</span><br>{{ r.finding }}</div>
+      <span class="owner">owner: {{ r.owner }}</span><br>{{ r.finding }}
+      {% if r.remediation %}
+      <ul class="remediation">
+        <li><span class="k">Add:</span> {{ r.remediation.add_fields | join('; ') }}</li>
+        <li><span class="k">Enables:</span> {{ r.remediation.enables }}</li>
+        <li><span class="k">Where:</span> {{ r.remediation.where_labels | join('; ') }}</li>
+      </ul>
+      {% endif %}
+    </div>
     {% endfor %}
   {% else %}<p>None.</p>{% endif %}
 

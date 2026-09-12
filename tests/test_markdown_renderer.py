@@ -42,6 +42,19 @@ def test_render_markdown_includes_run_metadata_and_check_findings():
     assert "ops@example.com" in md
 
 
+def test_render_markdown_recommendations_include_remediation_and_context_advisory():
+    cfg = _config()
+    md = render_markdown(run_scan(cfg, config_path="cfg.yaml"), cfg)
+    # The simple fixture WARNs on C2 (small skew) and C7 (composite key
+    # only), so there are check-backed recommendations to enrich...
+    assert "  - Add: " in md
+    assert "  - Enables: " in md
+    assert "  - Where: " in md
+    # ...and it carries none of the agent-context fields.
+    assert "[ADVISORY] clean_source / CTX (Agent context fields)" in md
+    assert "maintenance_window" in md
+
+
 def test_render_markdown_surfaces_envelope_hint_with_the_fix():
     cfg = ScannerConfig(
         version="1.0",

@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 from scanner.checks.base import CheckResult
 from scanner.config import PrecedenceRule, SourceConfig
+from scanner.playbook import Remediation, missing_context_fields, remediation_for
 from scanner.scoring import SourceVerdict
 
 ConflictCategory = Literal["missing_precedence_rule"]
@@ -29,6 +30,9 @@ class SourceEntry(BaseModel):
     checks: dict[str, CheckResult]
     verdict: SourceVerdict
     origin_values: set[str]
+    field_names: set[str] = set()
+    """Every field observed in the sample (post-flattening). Only the
+    context-field advisory reads it."""
 
     model_config = {"arbitrary_types_allowed": True}
 
@@ -45,8 +49,17 @@ class Recommendation(BaseModel):
     check_id: str
     check_name: str
     status: str
+    """FAIL / WARN for a check-backed recommendation; ADVISORY for the
+    context-field note, which is never a deficiency."""
     owner: str
     finding: str
+    remediation: Remediation | None = None
+    """What to add, what it enables, where the fix lives (see playbook.py).
+    Additive: never read by scoring or eligibility."""
+
+
+_CONTEXT_CHECK_ID = "CTX"
+_STATUS_ORDER = {"FAIL": 0, "WARN": 1, "ADVISORY": 2}
 
 
 class EstateSummary(BaseModel):
@@ -118,7 +131,11 @@ def build_estate_summary(entries: list[SourceEntry]) -> EstateSummary:
 
 
 def build_recommendations(entries: list[SourceEntry]) -> list[Recommendation]:
-    """Ordered FAIL before WARN, then by source name, then check ID."""
+    """Ordered FAIL, then WARN, then ADVISORY; within each, by source name,
+    then check ID. Every FAIL/WARN carries the playbook's remediation
+    (what to add, what it enables, where the fix lives). A source that
+    lacks the agent-context fields gets one ADVISORY entry naming them --
+    one line, not one per field, so it can't drown the real findings."""
     recommendations: list[Recommendation] = []
 
     for entry in entries:
@@ -133,11 +150,38 @@ def build_recommendations(entries: list[SourceEntry]) -> list[Recommendation]:
                     status=result.status,
                     owner=entry.source.owner,
                     finding=result.findings[0] if result.findings else "",
+                    remediation=remediation_for(result),
+                )
+            )
+
+        missing = missing_context_fields(entry.field_names)
+        if missing and entry.field_names:
+            recommendations.append(
+                Recommendation(
+                    source=entry.name,
+                    check_id=_CONTEXT_CHECK_ID,
+                    check_name="Agent context fields",
+                    status="ADVISORY",
+                    owner=entry.source.owner,
+                    finding=(
+                        "no agent-context field present: "
+                        + ", ".join(name for name, _ in missing)
+                        + " -- not a completeness deficiency; these come from the asset "
+                        "inventory or change calendar, not the device"
+                    ),
+                    remediation=Remediation(
+                        add_fields=[f"{name} -- {why}" for name, why in missing],
+                        enables=(
+                            "the agent can tell intended downtime, environment, and impact "
+                            "apart *before* acting, instead of discovering them afterwards"
+                        ),
+                        where=["pipeline", "query"],
+                    ),
                 )
             )
 
     def sort_key(rec: Recommendation) -> tuple[int, str, str]:
-        return (0 if rec.status == "FAIL" else 1, rec.source, rec.check_id)
+        return (_STATUS_ORDER.get(rec.status, 9), rec.source, rec.check_id)
 
     recommendations.sort(key=sort_key)
     return recommendations
