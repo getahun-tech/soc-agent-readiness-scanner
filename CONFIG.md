@@ -8,6 +8,12 @@ pydantic model behind this document.
 See [examples/demo.yaml](examples/demo.yaml) for a complete, working
 example against the bundled samples.
 
+**Starting without a config:** `scanner quickscan <file-or-glob>` runs
+the same scan with defaults for everything below, and `--emit-config
+scanner.yaml` writes the equivalent config — only what differs from the
+defaults — so a first look becomes a durable, reviewed one. Every
+option in this document is then a change to that file.
+
 ## Top-level fields
 
 | Field | Type | Required | Description |

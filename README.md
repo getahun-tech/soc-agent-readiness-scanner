@@ -32,16 +32,37 @@ intentionally not built yet.
 
 ## Quickstart
 
+No config needed for a first look — point it at a file:
+
 ```bash
 pip install -e .
+scanner quickscan ./your-export.jsonl
+```
+
+That's the full report, with defaults for everything else. If the file
+is a Splunk JSON export, add `--record-root result` (the report will
+tell you if you needed it). When it's worth keeping, let it write the
+config for you:
+
+```bash
+scanner quickscan ./your-export.jsonl --record-root result --emit-config scanner.yaml
+scanner scan --config scanner.yaml --format markdown
+```
+
+The emitted config holds only what you chose — set each source's
+`owner:`, then grow it from there ([CONFIG.md](CONFIG.md)).
+
+To see every check fire, scan the bundled demo instead:
+
+```bash
 scanner scan --config examples/demo.yaml --format markdown
 ```
 
 This runs entirely offline against the synthetic sample data bundled in
 `./samples/` — no network calls, no credentials, nothing outside this
-repo. `--format json` (the default) or `--format html` work the same
-way. Try `scanner validate-config --config examples/demo.yaml` first if
-you just want to check the config parses.
+repo. `--format json` (the default for `scan`) or `--format html` work
+the same way. Try `scanner validate-config --config examples/demo.yaml`
+first if you just want to check the config parses.
 
 ## Example output
 
