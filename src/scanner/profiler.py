@@ -28,7 +28,21 @@ _TIMESTAMP_FIELD_CANDIDATES = [
     "event_time",
     "datetime",
     "date",
+    # Platform-native names that reach us through file exports. The Splunk
+    # *adapter* aliases `_time` to `timestamp` itself, but a Splunk JSON/CSV
+    # export read through the file adapter still carries the raw name.
+    "_time",  # Splunk
+    "TimeGenerated",  # Microsoft Sentinel / Log Analytics
+    "eventTime",  # AWS CloudTrail
 ]
+
+# An "envelope" is a single nested key holding (nearly) the whole record,
+# with only transport metadata beside it -- Splunk's JSON export
+# (`preview`/`offset` + `result`), a raw Elastic export (`_source`),
+# Windows XML-to-JSON (`Event`). Thresholds: the key must cover this share
+# of a record's fields, in this share of records, to be called one.
+_ENVELOPE_MIN_FIELD_SHARE = 0.8
+_ENVELOPE_MIN_RECORD_SHARE = 0.9
 
 
 class FieldStats(BaseModel):
@@ -75,6 +89,11 @@ class ProfileResult(BaseModel):
     field_stats: dict[str, FieldStats]
     timestamp_analysis: TimestampAnalysis
     parse_error_examples: list[str] = Field(default_factory=list)
+    envelope_hint: str | None = None
+    """Set when the records look wrapped in one envelope key (see
+    _ENVELOPE_* above): the real fields sit one level down under this
+    name, so field-hint matching will miss most of them. Reported, never
+    acted on -- unwrapping is the source's explicit `record_root` decision."""
 
 
 def _value_type_name(value: Any) -> str:
@@ -115,7 +134,31 @@ class Profiler:
             field_stats=field_stats,
             timestamp_analysis=timestamp_analysis,
             parse_error_examples=[e for e in parse_error_examples if e],
+            envelope_hint=self._envelope_hint(records),
         )
+
+    def _envelope_hint(self, records: list[RawRecord]) -> str | None:
+        """Adapters flatten nested objects to dotted keys, so an enveloped
+        record shows up here as most keys sharing one first segment
+        (`result.host`, `result._time`, ...) next to a couple of bare
+        transport keys (`preview`, `offset`). A genuinely nested schema
+        like ECS spreads keys across many prefixes and never trips this."""
+        parsed = [r.parsed for r in records if r.parsed]
+        if not parsed:
+            return None
+        votes: Counter[str] = Counter()
+        for fields in parsed:
+            keys = list(fields.keys())
+            if len(keys) < 2:
+                continue
+            prefixes = Counter(k.split(".", 1)[0] for k in keys if "." in k)
+            for prefix, count in prefixes.items():
+                if count / len(keys) >= _ENVELOPE_MIN_FIELD_SHARE:
+                    votes[prefix] += 1
+        if not votes:
+            return None
+        prefix, count = votes.most_common(1)[0]
+        return prefix if count / len(parsed) >= _ENVELOPE_MIN_RECORD_SHARE else None
 
     def _field_stats(self, records: list[RawRecord]) -> dict[str, FieldStats]:
         record_count = len(records)

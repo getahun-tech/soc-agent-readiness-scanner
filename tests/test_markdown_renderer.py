@@ -42,6 +42,25 @@ def test_render_markdown_includes_run_metadata_and_check_findings():
     assert "ops@example.com" in md
 
 
+def test_render_markdown_surfaces_envelope_hint_with_the_fix():
+    cfg = ScannerConfig(
+        version="1.0",
+        ruleset_version="test",
+        defaults=DefaultsConfig(sample_size=100, sample_strategy="random", seed=1),
+        sources=[
+            SourceConfig(
+                name="export",
+                adapter="file",
+                path=str(FIXTURES / "enveloped" / "splunk_export.jsonl"),
+                owner="ops@example.com",
+            )
+        ],
+    )
+    md = render_markdown(run_scan(cfg, config_path="cfg.yaml"), cfg)
+    assert "envelope key `result`" in md
+    assert "record_root: result" in md
+
+
 def test_render_markdown_handles_error_sources(monkeypatch):
     # No live Splunk here -- exercises rendering of a non-"ok" source, using
     # the credential guard as a convenient, deterministic way to produce one.

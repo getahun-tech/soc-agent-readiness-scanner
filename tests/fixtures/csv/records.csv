@@ -1,0 +1,8 @@
+﻿timestamp,host,action,user,dst,status,note
+2026-01-01T00:00:00Z,web01,login,alice,db01,success,ok
+2026-01-01T00:00:01Z,web02,login,bob,db01,failure,"multi
+line note"
+2026-01-01T00:00:02Z,web01,logout,alice,,success,
+2026-01-01T00:00:03Z,web02,login,carol,db02,success,ok
+2026-01-01T00:00:04Z,web01,login,dave,db02,success,ok
+

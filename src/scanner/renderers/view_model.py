@@ -15,6 +15,7 @@ from scanner.config import ScannerConfig
 def _build_source_view(name: str, result: dict[str, Any], config: ScannerConfig) -> dict[str, Any]:
     source_cfg = next(s for s in config.sources if s.name == name)
     checks = list(result["checks"].values()) if result.get("checks") else []
+    profile = result.get("profile") or {}
     return {
         "name": name,
         "status": result["status"],
@@ -24,6 +25,8 @@ def _build_source_view(name: str, result: dict[str, Any], config: ScannerConfig)
         "sample": result["sample"],
         "verdict": result.get("verdict"),
         "checks": checks,
+        "envelope_hint": profile.get("envelope_hint"),
+        "parse_error_examples": profile.get("parse_error_examples") or [],
     }
 
 

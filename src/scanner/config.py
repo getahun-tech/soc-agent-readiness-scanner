@@ -302,12 +302,31 @@ class SourceConfig(BaseModel):
     schema_: str | None = Field(default=None, alias="schema")
     event_class: EventClass | None = None
     """See EventClass. None (undeclared) keeps C8 advisory-only."""
+    record_root: str | None = None
+    """File adapter only. Envelope key to unwrap before profiling, for
+    exports that wrap each event in transport metadata: ``result`` for
+    Splunk's JSON export format (``{"preview": ..., "offset": ...,
+    "result": {...the event...}}``), ``_source`` for a raw Elastic export.
+    The nested object's fields become the record and the wrapper's own
+    keys are discarded. A record lacking the key is kept but flagged with
+    a parse_error, so a misconfigured root is visible rather than silent.
+    Never inferred: when records *look* enveloped the report says so and
+    names the key, but unwrapping stays an explicit config decision."""
     authoritative_over: list[str] = Field(default_factory=list)
     owner: str
     sample_size: int | None = None
     sample_strategy: SampleStrategy | None = None
 
     model_config = {"populate_by_name": True}
+
+    @model_validator(mode="after")
+    def _record_root_is_file_only(self) -> SourceConfig:
+        if self.record_root is not None and self.adapter != "file":
+            raise ValueError(
+                f"source '{self.name}': record_root only applies to adapter 'file' -- the "
+                f"'{self.adapter}' adapter already returns unwrapped events"
+            )
+        return self
 
     @model_validator(mode="after")
     def _adapter_requires_its_location(self) -> SourceConfig:

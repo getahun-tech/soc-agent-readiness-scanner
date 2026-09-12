@@ -228,6 +228,37 @@ sources:
         load_config(p)
 
 
+def test_record_root_is_accepted_for_file_sources_and_rejected_elsewhere(tmp_path):
+    ok = tmp_path / "ok.yaml"
+    ok.write_text("""
+version: "1.0"
+ruleset_version: "2026.07"
+sources:
+  - name: export
+    adapter: file
+    path: ./export/*.json
+    record_root: result
+    owner: "ops@example.com"
+""")
+    assert load_config(ok).sources[0].record_root == "result"
+
+    bad = tmp_path / "bad.yaml"
+    bad.write_text("""
+version: "1.0"
+ruleset_version: "2026.07"
+splunk:
+  host: "splunk.example.com"
+sources:
+  - name: live
+    adapter: splunk
+    query: "index=main"
+    record_root: result
+    owner: "ops@example.com"
+""")
+    with pytest.raises(ValidationError, match="record_root"):
+        load_config(bad)
+
+
 def test_per_source_overrides_effective_sample_settings(tmp_path):
     p = tmp_path / "config.yaml"
     p.write_text("""

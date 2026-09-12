@@ -118,6 +118,15 @@ not just log-oriented ones, since a non-log dataset's origin question
 ("who says so") means who created or is accountable for a record, not
 which device reported it.
 
+Dotted candidates such as `destination.ip` or `userIdentity.userName`
+match **nested** documents too: the file and Elastic adapters flatten
+nested objects to dotted-path keys before profiling, so an ECS document
+that nests `destination: {ip: ...}` is seen as `destination.ip`. Lists
+are kept whole (a multivalue field is one field), and nesting deeper
+than 16 levels is left as an opaque value. If instead a whole record is
+wrapped inside one key (a Splunk export's `result`), that's an envelope,
+not a schema — see `record_root` under [`sources`](#sources).
+
 | List | Built-in default |
 | --- | --- |
 | `origin` | `host`, `hostname`, `host_name`, `device`, `device_name`, `computer`, `reporting_device`, `source_host`, `src`, `src_host`, `src_ip`, `src_nt_host`, `srcip`, `shost`, `dvc`, `dvc_host`, `dvchost`, `agent.hostname`, `observer.hostname`, `Dvc`, `DvcHostname`, `SrcHostname`, `Computer`, `WorkstationName`, `rhost`, `sourceIPAddress`, `created_by`, `created_by_id`, `author`, `author_id`, `owner`, `owner_id`, `record_owner`, `data_owner`, `data_steward`, `account_owner`, `opportunity_owner`, `sales_rep`, `sales_rep_id`, `submitted_by`, `processed_by`, `entered_by`, `hr_admin`, `user_id`, `employee_id`, `actor_id`, `source_system`, `modified_by`, `updated_by`, `last_modified_by` |
@@ -167,11 +176,12 @@ sources:
 | --- | --- | --- | --- |
 | `name` | string | yes | Unique within the config. Used as the key everywhere in output (report sections, journal entries, conflict findings). |
 | `adapter` | `file` \| `splunk` \| `sentinel` \| `elastic` | yes | Which adapter fetches this source. |
-| `path` | string | if `adapter: file` | Glob pattern, e.g. `./samples/clean_firewall/*.jsonl`. |
+| `path` | string | if `adapter: file` | Glob pattern, e.g. `./samples/clean_firewall/*.jsonl`. Format is decided per file by extension: `.csv`/`.tsv` are parsed with the header row as field names (a quoted cell may span lines; an empty cell means the field is *absent* from that row). Everything else is one record per line — JSON objects (nested objects flattened to dotted keys like `destination.ip`), then logfmt `key=value`, then a raw-text fallback. Plain syslog headers are not parsed. |
 | `query` | string | if `adapter: splunk`, `sentinel`, or `elastic` | The query, in that backend's own language: SPL for Splunk, KQL for Sentinel, a Lucene `query_string` for Elastic. A bounding clause (`\| head N` / `\| take N` / `size`) is appended automatically; you don't need to add one. |
 | `index` | string | if `adapter: elastic` | Index or index pattern to search, e.g. `logs-firewall-*`. Not used by other adapters. |
 | `schema` | string | no | Declared schema name (e.g. a CIM data model). Informational; not currently enforced by any check. (YAML key is `schema`; the Python field is `schema_` since `schema` collides with pydantic internals — either key works when loading YAML.) |
 | `event_class` | `activity` \| `state` \| `mixed` | no | What kind of events this source records, for C8 (actor/initiator). `activity` (auth, file ops, config changes — an actor is expected): C8 is scored. `state` (down, degraded, threshold crossed — no actor exists by definition): C8 reports NOT_ASSESSED. `mixed`: C8 is scored but FAIL softens to WARN. Undeclared: C8 runs advisory-only — it reports what it found but never scores or fails. Declared, never inferred, because a missing actor field is ambiguous between "incomplete log" and "not applicable," and only the source owner knows which. |
+| `record_root` | string | no (file adapter only) | Envelope key to unwrap before profiling, for exports that wrap each event in transport metadata. Splunk's JSON export is the canonical case — every line is `{"preview": ..., "offset": ..., "result": {...the event...}}`, so `record_root: result` makes the event's own fields the record. Also `_source` for a raw Elastic export, `Event` for Windows XML-to-JSON. A record lacking the key is kept but flagged with a parse error, so a wrong root is visible. The scanner never unwraps on its own: when records *look* enveloped, the report says so and names the key, and this setting is how you act on it. |
 | `authoritative_over` | list of string | no (default `[]`) | Other source names this source is authoritative over, for the missing-precedence-rule conflict check. |
 | `owner` | string | yes | Email/identity that owns fixes for this source. Used to route recommendations and eligibility-gate failures. |
 | `sample_size` | int | no | Overrides `defaults.sample_size` for this source only. |

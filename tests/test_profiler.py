@@ -73,3 +73,45 @@ def test_profile_empty_sample_does_not_crash():
     assert profile.record_count == 0
     assert profile.parse_rate == 0.0
     assert profile.timestamp_analysis.candidate_field is None
+    assert profile.envelope_hint is None
+
+
+def test_envelope_hint_names_the_wrapper_key_of_an_enveloped_export():
+    # Splunk's JSON export: two transport keys + everything under 'result'.
+    records = _load(str(FIXTURES / "enveloped" / "splunk_export.jsonl"))
+    profile = Profiler().profile("enveloped", records)
+    assert profile.envelope_hint == "result"
+    # And the timestamp is invisible until the envelope is unwrapped.
+    assert profile.timestamp_analysis.candidate_field is None
+
+
+def test_envelope_hint_is_none_for_flat_and_for_genuinely_nested_schemas():
+    assert Profiler().profile("flat", _load(str(FIXTURES / "simple" / "records.jsonl"))).envelope_hint is None
+    # ECS spreads fields across many prefixes (event.*, source.*,
+    # destination.*, agent.*) -- no single one dominates, so no hint.
+    nested = Profiler().profile("nested", _load(str(FIXTURES / "nested" / "records.jsonl")))
+    assert nested.envelope_hint is None
+    assert nested.field_stats["destination.ip"].presence_rate == 1.0
+
+
+def test_platform_native_timestamp_names_are_recognized():
+    # `_time` is what a Splunk export carries; only the Splunk *adapter*
+    # aliases it to `timestamp`, a file export still has the raw name.
+    cfg = ScannerConfig(
+        version="1.0",
+        ruleset_version="test",
+        defaults=DefaultsConfig(sample_size=100, sample_strategy="random", seed=1),
+        sources=[],
+    )
+    source = SourceConfig(
+        name="s",
+        adapter="file",
+        path=str(FIXTURES / "enveloped" / "splunk_export.jsonl"),
+        owner="ops@example.com",
+        record_root="result",
+    )
+    records = list(FileAdapter().fetch_sample(source, cfg)[0])
+    ts = Profiler().profile("s", records).timestamp_analysis
+    assert ts.candidate_field == "_time"
+    assert ts.parse_rate == 1.0
+    assert ts.explicit_timezone_rate == 1.0

@@ -58,6 +58,7 @@
   .eligibility.eligible { background: #dafbe1; color: var(--pass); }
   .eligibility.not-eligible { background: #ffebe9; color: var(--fail); }
   .gate-fail { font-size: 0.88rem; color: var(--fail); margin: 0.15rem 0; }
+  .note { border-left: 4px solid var(--warn); background: #fffbe8; padding: 0.5rem 0.9rem; margin: 0.5rem 0; font-size: 0.9rem; }
   .dim-block h4 { margin-bottom: 0.3rem; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
   ul.checks { list-style: none; margin: 0; padding: 0; }
   li.check { margin: 0.6rem 0; }
@@ -115,6 +116,12 @@
         owner {{ s.owner }} &middot;
         sample {{ s.sample.actual_size }}/{{ s.sample.requested_size }} (strategy={{ s.sample.strategy }}, seed={{ s.sample.seed }}, population={{ s.sample.population_size }})
       </div>
+      {% if s.envelope_hint %}
+      <div class="note"><strong>Note:</strong> records look wrapped in an envelope key <code>{{ s.envelope_hint }}</code> &mdash; the real fields sit one level down, so most checks below will miss them. For a file source, set <code>record_root: {{ s.envelope_hint }}</code> on this source to unwrap it and re-run.</div>
+      {% endif %}
+      {% if s.parse_error_examples %}
+      <div class="note"><strong>Parse errors</strong> (first few): {% for e in s.parse_error_examples %}<code>{{ e }}</code>{{ "; " if not loop.last }}{% endfor %}</div>
+      {% endif %}
 
       <div class="scores">
         <div class="score-card">Completeness<br><span class="value">{{ s.verdict.completeness.score }}/{{ s.verdict.completeness.denominator }}</span>{% if s.verdict.completeness.percent is not none %} <span class="label">({{ s.verdict.completeness.percent }}%)</span>{% endif %} <span class="label">(C6 excluded)</span></div>
@@ -132,7 +139,7 @@
 
       {% if s.checks %}
       <div class="dim-block">
-        <h4>Completeness (C1&ndash;C7)</h4>
+        <h4>Completeness (C1&ndash;C8)</h4>
         {{ check_block(s.checks) }}
       </div>
       {% endif %}

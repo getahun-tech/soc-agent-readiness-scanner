@@ -131,6 +131,13 @@ validate-config --config <path>` checks a config without running a scan.
 
 ## Limitations
 
+- File inputs are read as JSON-per-line (nested objects flattened to
+  dotted keys, with `record_root` to unwrap enveloped exports such as
+  Splunk's), logfmt `key=value` lines, or CSV/TSV with a header row.
+  There is no RFC3164/5424 syslog header parser yet — plain syslog lands
+  in the raw-text fallback and will score as unstructured. Point the
+  scanner at the SIEM (Splunk/Sentinel/Elastic adapters) for such
+  sources instead, where the fields are already extracted.
 - Sampling is bounded and, for `random`/`stratified` strategies against
   Splunk or Sentinel, an oversample-then-locally-sample approximation —
   not a query against the full matching result set, since neither has a

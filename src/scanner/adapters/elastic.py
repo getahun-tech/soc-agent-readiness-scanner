@@ -24,7 +24,7 @@ from typing import Any, Protocol
 from scanner.adapters.base import Adapter
 from scanner.config import ElasticConnectionConfig, ScannerConfig, SourceConfig
 from scanner.exceptions import AdapterError
-from scanner.models import RawRecord, SampleMetadata
+from scanner.models import RawRecord, SampleMetadata, flatten_record
 from scanner.sampling import stratified_sample_by_group
 
 # Index-level privileges that indicate the connected key can write to or
@@ -167,7 +167,9 @@ class ElasticAdapter(Adapter):
                 origin_path=str(item.get("_index", source.index)),
                 origin_line_no=i,
                 raw_text=str(item),
-                parsed={k: v for k, v in item.items() if k != "_index"},
+                # ECS documents nest everything (destination -> ip, host ->
+                # name); the field-hint candidates use the dotted names.
+                parsed=flatten_record({k: v for k, v in item.items() if k != "_index"}),
                 parse_error=None,
                 structured=True,
             )

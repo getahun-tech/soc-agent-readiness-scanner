@@ -186,6 +186,10 @@ def test_fetch_sample_builds_structured_raw_records_and_strips_index_field(monke
     assert records[0].parse_error is None
     assert "_index" not in records[0].parsed
     assert records[0].parsed["@timestamp"] == "2026-01-01T00:00:00Z"
+    # ECS nesting is flattened so the dotted field-hint candidates match.
+    assert records[0].parsed["host.name"] == "host0"
+    assert records[0].parsed["event.action"] == "block"
+    assert "host" not in records[0].parsed
     assert records[0].origin_path == "logs-firewall-2026.01"
     assert records[0].source_name == "elastic_src"
 

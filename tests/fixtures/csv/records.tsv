@@ -1,0 +1,4 @@
+timestamp	host	action
+2026-01-01T00:00:00Z	web01	login
+2026-01-01T00:00:01Z	web02	logout
+2026-01-01T00:00:02Z	web01	login
