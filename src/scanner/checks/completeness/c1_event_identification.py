@@ -15,18 +15,11 @@ from __future__ import annotations
 import re
 
 from scanner.checks.base import Check, CheckContext, CheckResult
+from scanner.config import DEFAULT_EVENT_TYPE_FIELD_CANDIDATES
 from scanner.models import get_field
 from scanner.profiler import find_field_stats
 
-EVENT_TYPE_FIELD_CANDIDATES = [
-    "action",
-    "event_type",
-    "signature",
-    "event",
-    "type",
-    "name",
-    "message_type",
-]
+EVENT_TYPE_FIELD_CANDIDATES = DEFAULT_EVENT_TYPE_FIELD_CANDIDATES
 _ENUM_LIKE = re.compile(r"^[A-Za-z0-9_\-.:]{1,40}$")
 _MIN_RECORDS_FOR_CARDINALITY_CHECK = 10
 _HIGH_CARDINALITY_RATIO = 0.5
@@ -49,9 +42,10 @@ class C1EventIdentification(Check):
                 records_total=0,
             )
 
+        candidates = ctx.field_hints.event_type or EVENT_TYPE_FIELD_CANDIDATES
         best_field = None
         best_presence = 0
-        for candidate in EVENT_TYPE_FIELD_CANDIDATES:
+        for candidate in candidates:
             found = find_field_stats(profile.field_stats, candidate)
             if found and found[1].presence_count > best_presence:
                 best_field, best_presence = found[0], found[1].presence_count
@@ -60,13 +54,10 @@ class C1EventIdentification(Check):
             return self.result(
                 "FAIL",
                 findings=[
-                    (
-                        f"no identifiable event-type field found among candidates "
-                        f"{EVENT_TYPE_FIELD_CANDIDATES}"
-                    )
+                    f"no identifiable event-type field found among candidates {list(candidates)}"
                 ],
                 evidence={
-                    "candidates_tried": EVENT_TYPE_FIELD_CANDIDATES,
+                    "candidates_tried": list(candidates),
                     "record_count": record_count,
                 },
                 records_passed=0,

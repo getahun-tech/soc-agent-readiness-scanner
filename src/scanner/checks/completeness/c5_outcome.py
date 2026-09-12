@@ -33,7 +33,7 @@ class C5Outcome(Check):
                 records_total=0,
             )
 
-        candidates = ctx.config.field_hints.outcome or _DEFAULT_OUTCOME_CANDIDATES
+        candidates = ctx.field_hints.outcome or _DEFAULT_OUTCOME_CANDIDATES
         best_field = None
         best_presence = 0
         for candidate in candidates:

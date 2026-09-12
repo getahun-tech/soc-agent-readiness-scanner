@@ -27,6 +27,7 @@ def _build_source_view(name: str, result: dict[str, Any], config: ScannerConfig)
         "checks": checks,
         "envelope_hint": profile.get("envelope_hint"),
         "parse_error_examples": profile.get("parse_error_examples") or [],
+        "log_profile": result.get("log_profile"),
     }
 
 

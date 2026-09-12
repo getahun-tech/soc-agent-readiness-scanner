@@ -217,6 +217,40 @@ The baseline is the previous journal entry with the same `--config`
 path string, so run scheduled scans from the same directory with the
 same path to keep one continuous history per config.
 
+## Log-type profiles
+
+The generic checks judge every source against one set of expectations.
+Usually you know what a source *is* — `pan:traffic`,
+`WinEventLog:Security`, `SigninLogs` — and that changes what "complete"
+means. A **profile** describes a known log type: which fields play
+which role, what kind of events it records, which fields a correctly
+configured source always carries, and what to do when they're missing.
+The scanner auto-detects the profile from the data's `sourcetype`
+(Splunk), `Type` (Sentinel), or `event.dataset` (Elastic), or you name
+it with `profile:` on the source.
+
+With a profile, a finding stops being "no outcome field found" and
+becomes:
+
+```
+- [ADVISORY] firewall / PROFILE (Expected fields for Palo Alto Networks
+  firewall traffic log) -- 3/9 field(s) this log type normally carries
+  are below their expected presence: action (0% vs >= 99%), rule (0% vs
+  >= 95%), app (0% vs >= 90%)
+  - Guidance: Check each security policy rule's "Log at Session End"
+    setting and the log forwarding profile attached to it. In Splunk,
+    confirm the Palo Alto Networks Add-on is installed -- without its
+    field extractions most of these fields never exist.
+```
+
+Profiles are strictly additive: role hints go *first* in the candidate
+lists but the generic ones still follow, a profile's `event_class`
+applies only if the source didn't declare one, and conformance is
+advisory — the C1–C8 verdicts are exactly what they'd be without it. A
+source that mixes several log types gets told so, with the split. Nine
+profiles ship (`scanner profiles` lists them); writing your own is one
+YAML file — see [PROFILES.md](PROFILES.md).
+
 ## Standards mapping
 
 Most logging standards require the same record content in different

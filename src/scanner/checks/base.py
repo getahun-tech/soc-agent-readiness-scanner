@@ -13,7 +13,7 @@ from typing import Any, ClassVar, Literal
 
 from pydantic import BaseModel, computed_field
 
-from scanner.config import ScannerConfig, SourceConfig
+from scanner.config import EventClass, FieldHints, ScannerConfig, SourceConfig
 from scanner.identifier_resolver import IdentifierResolution
 from scanner.models import RawRecord
 from scanner.profiler import ProfileResult
@@ -77,6 +77,13 @@ class CheckContext:
     and affected-entity resolution answer different questions and must be
     able to disagree (e.g. well-attributed device, unidentifiable target).
     """
+    field_hints: FieldHints
+    """The candidate lists in effect for *this* source: the config's
+    hints, with a matched log-type profile's role hints prepended (see
+    profiles.py). Checks read these, not `config.field_hints`."""
+    event_class: EventClass | None
+    """The source's declared event_class, or the matched profile's when
+    the source didn't declare one. C8 reads this, not `source.event_class`."""
 
 
 def score_for(status: Status) -> float | None:

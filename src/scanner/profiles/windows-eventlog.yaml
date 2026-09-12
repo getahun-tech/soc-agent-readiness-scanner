@@ -1,0 +1,30 @@
+id: windows:eventlog
+name: Windows System / Application event log
+vendor: Microsoft
+match:
+  sourcetype:
+    - "WinEventLog:System"
+    - "WinEventLog:Application"
+    - "XmlWinEventLog:System"
+    - "XmlWinEventLog:Application"
+# Service starts and stops sit next to faults and hardware errors.
+event_class: mixed
+roles:
+  event_type: [EventCode, SourceName]
+  timestamp: [_time, TimeCreated]
+  origin: [ComputerName, Computer, host]
+  # Type is Information / Warning / Error -- the closest thing to an outcome.
+  outcome: [Type, Keywords]
+  correlation: [RecordNumber, ActivityID]
+expected_fields:
+  - {name: EventCode, presence: 0.99}
+  - {name: ComputerName, aliases: [Computer], presence: 0.99}
+  - {name: SourceName, presence: 0.95}
+  - {name: Type, presence: 0.90}
+  - {name: Message, presence: 0.90}
+guidance: >
+  If EventCode or ComputerName are missing, the input isn't being parsed
+  as a Windows event log -- check the Splunk Add-on for Microsoft Windows
+  input stanza (WinEventLog://System, WinEventLog://Application). These
+  logs carry no actor or target by nature for most events; C4 and C8
+  results here describe the log type, not a misconfiguration.

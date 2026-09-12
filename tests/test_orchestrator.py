@@ -111,6 +111,49 @@ def test_record_root_unwraps_export_so_every_check_sees_real_fields():
     assert src["verdict"]["eligibility"]["eligible"] is True
 
 
+def test_log_profile_is_detected_applied_and_its_shortfalls_recommended():
+    result = run_scan(_export_config(record_root="result"), config_path="cfg.yaml")
+    src = result["sources"]["export"]
+
+    lp = src["log_profile"]
+    assert lp["id"] == "windows:security"
+    assert "auto-detected" in lp["summary"]
+    assert lp["shortfalls"]  # fixture lacks every Windows field name
+
+    # The profile's event_class (activity) applied because the source
+    # didn't declare one -> C8 is scored, not advisory.
+    assert src["checks"]["C8"]["status"] == "PASS"
+    assert src["checks"]["C8"]["evidence"]["event_class"] == "activity"
+
+    # Conformance lands as an ADVISORY with the vendor guidance attached,
+    # and never touches the verdict.
+    profile_rec = next(r for r in result["recommendations"] if r["check_id"] == "PROFILE")
+    assert profile_rec["status"] == "ADVISORY"
+    assert "EventCode" in profile_rec["finding"]
+    assert "audit policy" in profile_rec["remediation"]["guidance"]
+    assert src["verdict"]["eligibility"]["eligible"] is True
+
+
+def test_mixed_sourcetypes_are_reported_and_no_profile_is_guessed():
+    cfg = ScannerConfig(
+        version="1.0",
+        ruleset_version="test",
+        defaults=DefaultsConfig(sample_size=100, sample_strategy="random", seed=1),
+        sources=[
+            SourceConfig(
+                name="mixed",
+                adapter="file",
+                path=str(FIXTURES / "mixed_sourcetypes" / "records.jsonl"),
+                owner="ops@example.com",
+            )
+        ],
+    )
+    src = run_scan(cfg, config_path="cfg.yaml")["sources"]["mixed"]
+    assert src["log_profile"]["id"] is None
+    assert src["log_profile"]["mixed"] is True
+    assert "split this source" in src["log_profile"]["summary"]
+
+
 def test_run_scan_reports_splunk_source_without_token_as_error(monkeypatch):
     # No live Splunk here -- this only exercises the credential guard.
     # See test_splunk_adapter.py for adapter behavior against a fake connection.

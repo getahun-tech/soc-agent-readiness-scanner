@@ -206,6 +206,30 @@ DEFAULT_ACTOR_FIELD_CANDIDATES = [
     "process_name",
     "ProcessName",
 ]
+DEFAULT_EVENT_TYPE_FIELD_CANDIDATES = [
+    "action",
+    "event_type",
+    "signature",
+    "event",
+    "type",
+    "name",
+    "message_type",
+]
+DEFAULT_TIMESTAMP_FIELD_CANDIDATES = [
+    "timestamp",
+    "@timestamp",
+    "time",
+    "ts",
+    "event_time",
+    "datetime",
+    "date",
+    # Platform-native names that reach us through file exports. The Splunk
+    # *adapter* aliases `_time` to `timestamp` itself, but a Splunk JSON/CSV
+    # export read through the file adapter still carries the raw name.
+    "_time",  # Splunk
+    "TimeGenerated",  # Microsoft Sentinel / Log Analytics
+    "eventTime",  # AWS CloudTrail
+]
 DEFAULT_CORRELATION_FIELD_CANDIDATES = [
     # generic
     "session_id",
@@ -236,6 +260,8 @@ class FieldHints(BaseModel):
     outcome: list[str] = Field(default_factory=lambda: list(DEFAULT_OUTCOME_FIELD_CANDIDATES))
     correlation: list[str] = Field(default_factory=lambda: list(DEFAULT_CORRELATION_FIELD_CANDIDATES))
     actor: list[str] = Field(default_factory=lambda: list(DEFAULT_ACTOR_FIELD_CANDIDATES))
+    event_type: list[str] = Field(default_factory=lambda: list(DEFAULT_EVENT_TYPE_FIELD_CANDIDATES))
+    timestamp: list[str] = Field(default_factory=lambda: list(DEFAULT_TIMESTAMP_FIELD_CANDIDATES))
 
 
 class DefaultsConfig(BaseModel):
@@ -321,6 +347,10 @@ class SourceConfig(BaseModel):
     a parse_error, so a misconfigured root is visible rather than silent.
     Never inferred: when records *look* enveloped the report says so and
     names the key, but unwrapping stays an explicit config decision."""
+    profile: str | None = None
+    """Log-type profile (see PROFILES.md). None: auto-detect from the
+    data's sourcetype-like field. An id such as `pan:traffic`: use that
+    profile. `none`: no profile, generic checks only."""
     authoritative_over: list[str] = Field(default_factory=list)
     owner: str
     sample_size: int | None = None
@@ -373,6 +403,9 @@ class ScannerConfig(BaseModel):
     field_hints: FieldHints = Field(default_factory=FieldHints)
     sources: list[SourceConfig]
     precedence_rules: list[PrecedenceRule] = Field(default_factory=list)
+    profile_dirs: list[str] = Field(default_factory=list)
+    """Directories of additional log-type profiles (*.yaml), loaded after
+    the bundled ones; a file with the same `id` overrides the bundled one."""
     splunk: SplunkConnectionConfig | None = None
     sentinel: SentinelConnectionConfig | None = None
     elastic: ElasticConnectionConfig | None = None

@@ -1,0 +1,31 @@
+id: pan:traffic
+name: Palo Alto Networks firewall traffic log
+vendor: Palo Alto Networks
+match:
+  sourcetype: ["pan:traffic", "pan_traffic"]
+# Sessions are activity, but src_user only exists with User-ID enabled.
+event_class: mixed
+roles:
+  event_type: [log_subtype, type]
+  timestamp: [_time, generated_time, receive_time]
+  origin: [dvc_name, dvc, host]
+  affected: [dest_ip, dest, dest_hostname]
+  outcome: [action, session_end_reason]
+  correlation: [session_id]
+  actor: [src_user, user]
+expected_fields:
+  - {name: src_ip, aliases: [src], presence: 0.99}
+  - {name: dest_ip, aliases: [dest], presence: 0.99}
+  - {name: dest_port, presence: 0.99}
+  - {name: action, presence: 0.99}
+  - {name: rule, presence: 0.95}
+  - {name: app, presence: 0.90}
+  - {name: transport, aliases: [protocol], presence: 0.90}
+  - {name: session_end_reason, presence: 0.50, note: session-end records only}
+  - {name: src_user, aliases: [user], presence: 0.10, note: requires User-ID; absent on unauthenticated traffic}
+guidance: >
+  Check each security policy rule's "Log at Session End" setting (and
+  "Log at Session Start" if start records are expected) and the log
+  forwarding profile attached to it. In Splunk, confirm the Palo Alto
+  Networks Add-on (or a CIM-compliant TA) is installed -- without its
+  field extractions most of these fields never exist.

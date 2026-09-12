@@ -1,0 +1,23 @@
+id: linux:secure
+name: Linux authentication log (/var/log/secure, auth.log)
+vendor: null
+match:
+  sourcetype: ["linux_secure", "linux:secure", "syslog:auth"]
+event_class: activity
+roles:
+  event_type: [action, app]
+  timestamp: [_time]
+  origin: [host]
+  affected: [dest]
+  outcome: [action]
+  actor: [user, src_user]
+expected_fields:
+  - {name: app, presence: 0.90, note: sshd, sudo, su, login}
+  - {name: user, presence: 0.70, note: not every message names a user}
+  - {name: action, presence: 0.70, note: success / failure, from Accepted/Failed lines}
+  - {name: src, aliases: [src_ip], presence: 0.50, note: ssh messages only}
+guidance: >
+  Field extractions come from the Splunk Add-on for Unix and Linux; raw
+  /var/log/secure lines otherwise arrive as unparsed text and C1 will
+  FAIL. sshd "Accepted"/"Failed" lines are the source of the outcome; if
+  `action` is absent, the extraction isn't applying to this sourcetype.

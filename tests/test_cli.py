@@ -249,6 +249,14 @@ def test_diff_needs_two_entries_and_an_existing_journal(tmp_path):
     assert only_one.exit_code == 1
 
 
+def test_profiles_command_lists_bundled_profiles():
+    result = runner.invoke(app, ["profiles"])
+    assert result.exit_code == 0, result.output
+    assert "pan:traffic" in result.stdout
+    assert "windows:security" in result.stdout
+    assert "profile(s)" in result.stdout
+
+
 # --- quickscan: no config at all -------------------------------------------
 
 

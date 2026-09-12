@@ -30,6 +30,12 @@ from scanner.estate import (
 from scanner.exceptions import AdapterError
 from scanner.identifier_resolver import IdentifierResolver
 from scanner.profiler import Profiler
+from scanner.profiles import (
+    ProfileRegistry,
+    describe_selection,
+    effective_field_hints,
+    select_profile,
+)
 from scanner.scoring import CompletenessScorer
 
 _ADAPTERS = {
@@ -62,6 +68,7 @@ def run_scan(
     # the two resolve() calls stay independent because each takes its own
     # candidate field list.
     resolver = IdentifierResolver()
+    registry = ProfileRegistry.load(config.profile_dirs)
     results: dict[str, Any] = {}
     entries: list[SourceEntry] = []
 
@@ -76,6 +83,7 @@ def run_scan(
                 ),
                 "sample": None,
                 "profile": None,
+                "log_profile": None,
                 "checks": None,
                 "verdict": None,
             }
@@ -83,20 +91,31 @@ def run_scan(
         try:
             records_iter, sample_meta = adapter.fetch_sample(source, config)
             records = list(records_iter)
-            profile = profiler.profile(source.name, records)
         except AdapterError as exc:
             results[source.name] = {
                 "status": "error",
                 "error": str(exc),
                 "sample": None,
                 "profile": None,
+                "log_profile": None,
                 "checks": None,
                 "verdict": None,
             }
             continue
 
-        origin_resolution = resolver.resolve(records, config.field_hints.origin)
-        affected_resolution = resolver.resolve(records, config.field_hints.affected)
+        # Log-type profile: declared, auto-detected from the data, or none.
+        # Its role hints go *first* in the candidate lists for this source;
+        # the config's own hints still follow, so it can only add places to
+        # look. Its event_class applies only if the source didn't declare one.
+        selection = select_profile(source, records, registry)
+        hints = effective_field_hints(config.field_hints, selection.profile)
+        event_class = source.event_class or (
+            selection.profile.event_class if selection.profile else None
+        )
+
+        profile = profiler.profile(source.name, records, timestamp_candidates=hints.timestamp)
+        origin_resolution = resolver.resolve(records, hints.origin)
+        affected_resolution = resolver.resolve(records, hints.affected)
         ctx = CheckContext(
             source=source,
             config=config,
@@ -104,9 +123,12 @@ def run_scan(
             records=records,
             origin_resolution=origin_resolution,
             affected_resolution=affected_resolution,
+            field_hints=hints,
+            event_class=event_class,
         )
         checks: dict[str, CheckResult] = {c.check_id: c.run(ctx) for c in COMPLETENESS_CHECKS}
         verdict = scorer.score(source, checks)
+        log_profile = describe_selection(selection, profile.field_stats)
 
         profile_json = profile.model_dump(mode="json")
         checks_json = {cid: cr.model_dump(mode="json") for cid, cr in checks.items()}
@@ -129,6 +151,7 @@ def run_scan(
                 verdict=verdict,
                 origin_values=origin_values,
                 field_names=set(profile.field_stats),
+                log_profile=log_profile,
             )
         )
 
@@ -137,6 +160,7 @@ def run_scan(
             "error": None,
             "sample": asdict(sample_meta),
             "profile": profile_json,
+            "log_profile": log_profile,
             "checks": checks_json,
             "verdict": verdict.model_dump(mode="json"),
         }

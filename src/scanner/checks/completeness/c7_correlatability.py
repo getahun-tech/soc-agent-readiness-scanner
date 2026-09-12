@@ -42,7 +42,7 @@ class C7Correlatability(Check):
                 records_total=0,
             )
 
-        candidates = ctx.config.field_hints.correlation or DEFAULT_CORRELATION_CANDIDATES
+        candidates = ctx.field_hints.correlation or DEFAULT_CORRELATION_CANDIDATES
         best_field = None
         best_rate = 0.0
         for candidate in candidates:

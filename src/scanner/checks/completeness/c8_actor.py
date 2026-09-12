@@ -38,7 +38,7 @@ class C8Actor(Check):
     def run(self, ctx: CheckContext) -> CheckResult:
         profile = ctx.profile
         record_count = profile.record_count
-        event_class = ctx.source.event_class
+        event_class = ctx.event_class  # declared on the source, or from its log-type profile
 
         if record_count == 0:
             return self.result(
@@ -64,7 +64,7 @@ class C8Actor(Check):
                 records_total=record_count,
             )
 
-        candidates = ctx.config.field_hints.actor or _DEFAULT_ACTOR_CANDIDATES
+        candidates = ctx.field_hints.actor or _DEFAULT_ACTOR_CANDIDATES
         best_field = None
         best_presence = 0
         for candidate in candidates:

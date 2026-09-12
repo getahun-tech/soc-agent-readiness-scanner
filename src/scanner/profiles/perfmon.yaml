@@ -1,0 +1,26 @@
+id: windows:perfmon
+name: Windows performance counters (Perfmon)
+vendor: Microsoft
+match:
+  sourcetype: ["Perfmon:*", "PerfmonMk:*"]
+# Counters are telemetry: no actor, no target, no outcome by nature.
+event_class: state
+roles:
+  event_type: [counter, object, collection]
+  timestamp: [_time]
+  origin: [host]
+expected_fields:
+  - {name: collection, presence: 0.99}
+  - {name: object, presence: 0.99}
+  - {name: counter, presence: 0.99}
+  - {name: instance, presence: 0.90}
+  - {name: Value, presence: 0.99}
+notes: >
+  C4 (affected entity), C5 (outcome) and C8 (actor) do not apply to
+  counters; their results describe the log type, not a gap. The checks
+  that matter for telemetry are C2 (regular, timezone-explicit
+  timestamps) and C3 (which host).
+guidance: >
+  If collection/object/counter/Value are missing, the perfmon input isn't
+  parsing -- check the [perfmon://...] stanza in the Splunk Add-on for
+  Microsoft Windows (mode=single vs. multikv changes the record shape).

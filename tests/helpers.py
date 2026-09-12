@@ -69,4 +69,6 @@ def build_ctx(
         records=records,
         origin_resolution=origin_resolution,
         affected_resolution=affected_resolution,
+        field_hints=cfg.field_hints,
+        event_class=event_class,  # type: ignore[arg-type]
     )

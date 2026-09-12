@@ -45,7 +45,7 @@ scanner = "scanner.cli:app"
 where = ["src"]
 
 [tool.setuptools.package-data]
-scanner = ["templates/*.j2"]
+scanner = ["templates/*.j2", "profiles/*.yaml"]
 
 [tool.ruff]
 line-length = 100

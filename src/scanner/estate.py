@@ -8,7 +8,7 @@ Phase 5" note in C7.
 from __future__ import annotations
 
 from itertools import combinations
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
@@ -33,6 +33,9 @@ class SourceEntry(BaseModel):
     field_names: set[str] = set()
     """Every field observed in the sample (post-flattening). Only the
     context-field advisory reads it."""
+    log_profile: dict[str, Any] | None = None
+    """What profiles.describe_selection() produced for this source: the
+    matched log-type profile (if any) and its conformance shortfalls."""
 
     model_config = {"arbitrary_types_allowed": True}
 
@@ -59,6 +62,7 @@ class Recommendation(BaseModel):
 
 
 _CONTEXT_CHECK_ID = "CTX"
+_PROFILE_CHECK_ID = "PROFILE"
 _STATUS_ORDER = {"FAIL": 0, "WARN": 1, "ADVISORY": 2}
 
 
@@ -151,6 +155,41 @@ def build_recommendations(entries: list[SourceEntry]) -> list[Recommendation]:
                     owner=entry.source.owner,
                     finding=result.findings[0] if result.findings else "",
                     remediation=remediation_for(result),
+                )
+            )
+
+        log_profile = entry.log_profile or {}
+        shortfalls = log_profile.get("shortfalls") or []
+        if shortfalls:
+            expected_total = len(log_profile.get("expected_fields") or [])
+            recommendations.append(
+                Recommendation(
+                    source=entry.name,
+                    check_id=_PROFILE_CHECK_ID,
+                    check_name=f"Expected fields for {log_profile['name']}",
+                    status="ADVISORY",
+                    owner=entry.source.owner,
+                    finding=(
+                        f"{len(shortfalls)}/{expected_total} field(s) this log type normally "
+                        f"carries are below their expected presence: "
+                        + ", ".join(
+                            f"{s['field']} ({s['observed_presence']:.0%} vs >= {s['expected_presence']:.0%})"
+                            for s in shortfalls
+                        )
+                    ),
+                    remediation=Remediation(
+                        add_fields=[
+                            s["field"] + (f" -- {s['note']}" if s.get("note") else "")
+                            for s in shortfalls
+                        ],
+                        enables=(
+                            "the source carries what this log type normally does, so an "
+                            "automation isn't working around gaps that a logging-config "
+                            "change would close"
+                        ),
+                        where=["device", "pipeline"],
+                        guidance=log_profile.get("guidance"),
+                    ),
                 )
             )
 

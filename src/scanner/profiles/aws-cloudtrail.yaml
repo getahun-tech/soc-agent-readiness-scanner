@@ -1,0 +1,29 @@
+id: aws:cloudtrail
+name: AWS CloudTrail
+vendor: Amazon Web Services
+match:
+  sourcetype: ["aws:cloudtrail", "aws.cloudtrail"]
+event_class: activity
+roles:
+  event_type: [eventName]
+  timestamp: [eventTime]
+  origin: [eventSource, awsRegion]
+  affected: [resources]
+  # errorCode is present only on failures -- presence is the outcome.
+  outcome: [errorCode, errorMessage]
+  correlation: [requestID, eventID]
+  actor: [userIdentity.userName, userIdentity.arn, userIdentity.principalId]
+expected_fields:
+  - {name: eventName, presence: 0.99}
+  - {name: eventSource, presence: 0.99}
+  - {name: eventTime, presence: 0.99}
+  - {name: awsRegion, presence: 0.99}
+  - {name: eventID, presence: 0.99}
+  - {name: userIdentity.arn, aliases: [userIdentity.principalId], presence: 0.95}
+  - {name: sourceIPAddress, presence: 0.95}
+  - {name: requestID, presence: 0.90}
+guidance: >
+  Make sure the trail is multi-region and logs management events for all
+  accounts in the organization; data events (S3 object-level, Lambda
+  invocations) are opt-in per resource type and absent by default. Nested
+  userIdentity fields are flattened to dotted names by the scanner.

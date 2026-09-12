@@ -33,6 +33,8 @@ class Remediation(BaseModel):
     """The decision an automation can make once the field exists."""
     where: list[FixPath]
     """Realistic implementation paths, most likely first."""
+    guidance: str | None = None
+    """Vendor-specific instructions, when a log-type profile supplies them."""
 
     @computed_field  # type: ignore[prop-decorator]
     @property

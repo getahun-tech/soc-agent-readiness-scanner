@@ -18,6 +18,7 @@ from scanner.config import ConfigError, DefaultsConfig, ScannerConfig, SourceCon
 from scanner.diff import RunDiff, diff_entries, find_baseline, load_journal, render_diff_markdown
 from scanner.exceptions import AdapterError
 from scanner.orchestrator import run_scan
+from scanner.profiles import ProfileError, ProfileRegistry
 from scanner.renderers import render_html, render_json, render_markdown
 from scanner.run_journal import append_journal_entry, build_journal_entry
 
@@ -103,7 +104,7 @@ def _execute(
             config_hash=config_hash,
             operator=resolved_operator,
         )
-    except AdapterError as exc:
+    except (AdapterError, ProfileError) as exc:
         err_console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(code=EXIT_INCOMPLETE) from exc
 
@@ -258,6 +259,27 @@ def scan(
     )
     _exit_if_incomplete(outcome.failed)
     _exit_if_policy_failed(outcome, fail_on)
+
+
+@app.command(name="profiles")
+def profiles(
+    profile_dir: Annotated[
+        list[str] | None,
+        typer.Option("--profile-dir", help="Additional profile directory (repeatable), as `profile_dirs:` in config."),
+    ] = None,
+) -> None:
+    """List the log-type profiles the scanner knows: bundled, plus any extra directories."""
+    try:
+        registry = ProfileRegistry.load(profile_dir or [])
+    except ProfileError as exc:
+        err_console.print(f"[bold red]{exc}[/bold red]")
+        raise typer.Exit(code=EXIT_INCOMPLETE) from exc
+    for p in registry.all():
+        console.print(
+            f"[bold]{p.id:<26}[/bold] {p.name}  [dim](event_class={p.event_class or 'undeclared'}; "
+            f"matches: {', '.join(p.match.sourcetype)})[/dim]"
+        )
+    console.print(f"\n{len(registry.all())} profile(s). See PROFILES.md to add your own.")
 
 
 @app.command(name="diff")

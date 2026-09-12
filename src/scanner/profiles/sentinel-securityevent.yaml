@@ -1,0 +1,26 @@
+id: sentinel:securityevent
+name: Windows Security events (Sentinel SecurityEvent table)
+vendor: Microsoft
+match:
+  sourcetype: ["SecurityEvent"]
+event_class: activity
+roles:
+  event_type: [EventID, Activity]
+  timestamp: [TimeGenerated]
+  origin: [Computer]
+  affected: [TargetUserName, TargetAccount]
+  correlation: [SubjectLogonId, TargetLogonId]
+  actor: [SubjectUserName, Account, SubjectAccount]
+expected_fields:
+  - {name: EventID, presence: 0.99}
+  - {name: Computer, presence: 0.99}
+  - {name: Activity, presence: 0.95}
+  - {name: TimeGenerated, presence: 0.99}
+  - {name: Account, presence: 0.90}
+  - {name: SubjectUserName, presence: 0.50, note: present on most but not all event IDs}
+  - {name: TargetUserName, presence: 0.30, note: logon and account-management events only}
+guidance: >
+  Which EventIDs arrive is set by the data collection rule's event-filter
+  tier (All / Common / Minimal) and by the Windows audit policy on the
+  host. There is no explicit outcome column; success vs. failure is in the
+  EventID itself (4624 vs. 4625), so C5 relies on the generic candidates.

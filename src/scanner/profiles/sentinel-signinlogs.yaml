@@ -1,0 +1,27 @@
+id: sentinel:signinlogs
+name: Microsoft Entra ID sign-in logs (Sentinel)
+vendor: Microsoft
+match:
+  sourcetype: ["SigninLogs", "AADNonInteractiveUserSignInLogs"]
+event_class: activity
+roles:
+  event_type: [Category, OperationName]
+  timestamp: [TimeGenerated]
+  origin: [SourceSystem]
+  affected: [AppDisplayName, ResourceDisplayName, ResourceId]
+  # ResultType 0 is success; anything else is a failure code.
+  outcome: [ResultType, ResultDescription]
+  correlation: [CorrelationId, Id]
+  actor: [UserPrincipalName, Identity, UserId]
+expected_fields:
+  - {name: UserPrincipalName, presence: 0.99}
+  - {name: IPAddress, presence: 0.95}
+  - {name: ResultType, presence: 0.99}
+  - {name: AppDisplayName, presence: 0.95}
+  - {name: TimeGenerated, presence: 0.99}
+  - {name: CorrelationId, presence: 0.95}
+guidance: >
+  Sign-in logs arrive through the Microsoft Entra ID data connector.
+  Missing columns usually mean the tenant's diagnostic setting isn't
+  exporting the SignInLogs category (or the non-interactive category, if
+  that table is expected), or the query projected columns away.

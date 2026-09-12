@@ -17,24 +17,11 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from scanner.config import DEFAULT_TIMESTAMP_FIELD_CANDIDATES
 from scanner.models import RawRecord, get_field
 from scanner.timeutil import parse_timestamp, to_comparable
 
-_TIMESTAMP_FIELD_CANDIDATES = [
-    "timestamp",
-    "@timestamp",
-    "time",
-    "ts",
-    "event_time",
-    "datetime",
-    "date",
-    # Platform-native names that reach us through file exports. The Splunk
-    # *adapter* aliases `_time` to `timestamp` itself, but a Splunk JSON/CSV
-    # export read through the file adapter still carries the raw name.
-    "_time",  # Splunk
-    "TimeGenerated",  # Microsoft Sentinel / Log Analytics
-    "eventTime",  # AWS CloudTrail
-]
+_TIMESTAMP_FIELD_CANDIDATES = DEFAULT_TIMESTAMP_FIELD_CANDIDATES
 
 # An "envelope" is a single nested key holding (nearly) the whole record,
 # with only transport metadata beside it -- Splunk's JSON export
@@ -112,7 +99,12 @@ def _hashable_repr(value: Any) -> str:
 
 
 class Profiler:
-    def profile(self, source_name: str, records: list[RawRecord]) -> ProfileResult:
+    def profile(
+        self,
+        source_name: str,
+        records: list[RawRecord],
+        timestamp_candidates: list[str] | None = None,
+    ) -> ProfileResult:
         record_count = len(records)
         parsed = [r for r in records if r.parse_error is None]
         structured = [r for r in records if r.structured]
@@ -120,7 +112,9 @@ class Profiler:
 
         field_stats = self._field_stats(records)
         distinct_field_sets, dominant_rate = self._field_set_variance(records)
-        timestamp_analysis = self._timestamp_analysis(records)
+        timestamp_analysis = self._timestamp_analysis(
+            records, timestamp_candidates or _TIMESTAMP_FIELD_CANDIDATES
+        )
 
         return ProfileResult(
             source_name=source_name,
@@ -200,14 +194,16 @@ class Profiler:
         dominant = shapes.most_common(1)[0][1]
         return len(shapes), dominant / total
 
-    def _timestamp_analysis(self, records: list[RawRecord]) -> TimestampAnalysis:
+    def _timestamp_analysis(
+        self, records: list[RawRecord], candidates: list[str]
+    ) -> TimestampAnalysis:
         record_count = len(records)
         if record_count == 0:
             return TimestampAnalysis(candidate_field=None, note="no records sampled")
 
         best_field: str | None = None
         best_count = 0
-        for candidate in _TIMESTAMP_FIELD_CANDIDATES:
+        for candidate in candidates:
             count = sum(1 for r in records if get_field(r.parsed, candidate) is not None)
             if count > best_count:
                 best_field, best_count = candidate, count
@@ -215,10 +211,7 @@ class Profiler:
         if best_field is None or best_count == 0:
             return TimestampAnalysis(
                 candidate_field=None,
-                note=(
-                    "no timestamp-like field found among candidates "
-                    f"{_TIMESTAMP_FIELD_CANDIDATES}"
-                ),
+                note=f"no timestamp-like field found among candidates {list(candidates)}",
             )
 
         parsed_values = 0

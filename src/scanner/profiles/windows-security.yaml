@@ -1,0 +1,32 @@
+id: windows:security
+name: Windows Security event log
+vendor: Microsoft
+match:
+  sourcetype: ["WinEventLog:Security", "XmlWinEventLog:Security"]
+event_class: activity
+roles:
+  event_type: [EventCode, signature_id, signature]
+  timestamp: [_time, TimeCreated]
+  origin: [ComputerName, Computer, host, dvc]
+  affected: [TargetUserName, dest, ObjectName, Object_Name, TargetDomainName]
+  # Keywords is the real outcome field: "Audit Success" / "Audit Failure".
+  outcome: [Keywords, action, status]
+  correlation: [Logon_ID, LogonId, TargetLogonId, RecordNumber, ActivityID]
+  actor: [SubjectUserName, Account_Name, user, src_user]
+expected_fields:
+  - {name: EventCode, presence: 0.99}
+  - {name: ComputerName, aliases: [Computer], presence: 0.99}
+  - {name: LogName, presence: 0.90}
+  - {name: Keywords, presence: 0.90, note: "Audit Success / Audit Failure -- the outcome"}
+  - {name: TaskCategory, presence: 0.80}
+  - {name: RecordNumber, presence: 0.90}
+  - {name: SubjectUserName, aliases: [Account_Name], presence: 0.50, note: present on most but not all event IDs}
+  - {name: TargetUserName, presence: 0.30, note: logon and account-management events only}
+guidance: >
+  Which EventCodes exist at all is decided by the audit policy (auditpol /
+  Advanced Audit Policy Configuration). If EventCode or ComputerName are
+  missing, the input isn't being parsed as a Windows event log -- check
+  the Splunk Add-on for Microsoft Windows input stanza
+  (WinEventLog://Security) and its renderXml setting: XML rendering
+  yields SubjectUserName/TargetUserName, classic rendering yields
+  Account_Name twice (subject and target), which flattens ambiguously.

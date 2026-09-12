@@ -24,6 +24,7 @@ option in this document is then a change to that file.
 | `field_hints` | [FieldHints](#field_hints) | no | Candidate field names checks use to locate origin/affected/outcome/correlation/actor fields. |
 | `sources` | list of [SourceConfig](#sources) | yes | The sources to scan. Names must be unique. |
 | `precedence_rules` | list of [PrecedenceRule](#precedence_rules) | no | Declares which source wins when two sources describe the same entities (used by the missing-precedence-rule conflict check). |
+| `profile_dirs` | list of string | no | Directories of additional log-type profiles (`*.yaml`), loaded after the bundled ones; a file with the same `id` overrides the bundled profile. See [PROFILES.md](PROFILES.md). |
 | `splunk` | [SplunkConnectionConfig](#splunk) | conditionally | Connection details shared by every `adapter: splunk` source. **Required** if any source uses `adapter: splunk`; the config is rejected at validation time otherwise. |
 | `sentinel` | [SentinelConnectionConfig](#sentinel) | conditionally | Connection details shared by every `adapter: sentinel` source. **Required** if any source uses `adapter: sentinel`. |
 | `elastic` | [ElasticConnectionConfig](#elastic) | conditionally | Connection details shared by every `adapter: elastic` source. **Required** if any source uses `adapter: elastic`. |
@@ -120,9 +121,13 @@ not a schema — see `record_root` under [`sources`](#sources).
 | `outcome` | `action`, `result`, `status`, `disposition`, `outcome`, `state`, `act`, `EventResult`, `DvcAction`, `event.outcome`, `event.action`, `status_id`, `disposition_id`, `errorCode` |
 | `correlation` | `session_id`, `transaction_id`, `trace_id`, `flow_id`, `request_id`, `correlation_id`, `span_id`, `SessionId`, `NetworkSessionId`, `EventUid`, `requestID`, `requestId`, `ActivityId`, `ProcessGuid`, `externalId` |
 | `actor` | `user`, `username`, `user_name`, `actor`, `account`, `initiated_by`, `performed_by`, `src_user`, `src_user_id`, `suser`, `sproc`, `user.name`, `source.user.name`, `process.name`, `ActorUsername`, `SrcUsername`, `SubjectUserName`, `userIdentity.userName`, `userIdentity.arn`, `userName`, `acct`, `auid`, `process_name`, `ProcessName` |
+| `event_type` | `action`, `event_type`, `signature`, `event`, `type`, `name`, `message_type` |
+| `timestamp` | `timestamp`, `@timestamp`, `time`, `ts`, `event_time`, `datetime`, `date`, `_time`, `TimeGenerated`, `eventTime` |
 
-(C1's event-type candidates are intentionally *not*
-`field_hints`-driven.)
+`event_type` feeds C1 and `timestamp` feeds the profiler's timestamp
+detection (and so C2 and C7). A matched log-type profile prepends its
+own role hints to every one of these lists for that source — see
+[PROFILES.md](PROFILES.md).
 
 **`origin` and `affected` must name different fields for a source where
 that distinction matters** — see C4's design note in the README. If the
@@ -168,6 +173,7 @@ sources:
 | `schema` | string | no | Declared schema name (e.g. a CIM data model). Informational; not currently enforced by any check. (YAML key is `schema`; the Python field is `schema_` since `schema` collides with pydantic internals — either key works when loading YAML.) |
 | `event_class` | `activity` \| `state` \| `mixed` | no | What kind of events this source records, for C8 (actor/initiator). `activity` (auth, file ops, config changes — an actor is expected): C8 is scored. `state` (down, degraded, threshold crossed — no actor exists by definition): C8 reports NOT_ASSESSED. `mixed`: C8 is scored but FAIL softens to WARN. Undeclared: C8 runs advisory-only — it reports what it found but never scores or fails. Declared, never inferred, because a missing actor field is ambiguous between "incomplete log" and "not applicable," and only the source owner knows which. |
 | `record_root` | string | no (file adapter only) | Envelope key to unwrap before profiling, for exports that wrap each event in transport metadata. Splunk's JSON export is the canonical case — every line is `{"preview": ..., "offset": ..., "result": {...the event...}}`, so `record_root: result` makes the event's own fields the record. Also `_source` for a raw Elastic export, `Event` for Windows XML-to-JSON. A record lacking the key is kept but flagged with a parse error, so a wrong root is visible. The scanner never unwraps on its own: when records *look* enveloped, the report says so and names the key, and this setting is how you act on it. |
+| `profile` | string | no | Log-type profile for this source. Omit to auto-detect from the data's sourcetype-like field (`sourcetype`, `Type`, `event.dataset`, …); an id such as `windows:security` to use that profile; `none` to disable profiles for this source. Profiles add role hints and an `event_class` default and produce an ADVISORY conformance recommendation; they never change a verdict. See [PROFILES.md](PROFILES.md). |
 | `authoritative_over` | list of string | no (default `[]`) | Other source names this source is authoritative over, for the missing-precedence-rule conflict check. |
 | `owner` | string | yes | Email/identity that owns fixes for this source. Used to route recommendations and eligibility-gate failures. |
 | `sample_size` | int | no | Overrides `defaults.sample_size` for this source only. |

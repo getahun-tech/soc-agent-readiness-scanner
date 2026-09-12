@@ -1,0 +1,27 @@
+id: cisco:asa
+name: Cisco ASA firewall syslog
+vendor: Cisco
+match:
+  sourcetype: ["cisco:asa"]
+event_class: mixed
+roles:
+  event_type: [message_id, signature_id]
+  timestamp: [_time]
+  origin: [host, dvc]
+  affected: [dest_ip, dest]
+  outcome: [action]
+  actor: [user, src_user]
+expected_fields:
+  - {name: message_id, presence: 0.99}
+  - {name: host, presence: 0.99}
+  - {name: action, presence: 0.50, note: connection and access-list messages only}
+  - {name: src_ip, aliases: [src], presence: 0.50, note: connection messages only}
+  - {name: dest_ip, aliases: [dest], presence: 0.50, note: connection messages only}
+  - {name: dest_port, presence: 0.40, note: connection messages only}
+guidance: >
+  What the ASA emits depends on the logging level per class (`logging
+  trap`, `logging class`) and any logging list filters. Connection
+  build/teardown messages (302013-302016) are what carry src/dest/port;
+  if only 1xxxxx system messages arrive, the traffic classes are
+  filtered out. Field names require the Cisco Security Suite / CIM
+  add-on in Splunk.

@@ -1,0 +1,5 @@
+{"_time": "2026-01-01T00:00:00.000-04:00", "sourcetype": "WinEventLog:Security", "host": "srv01", "EventCode": "4624", "ComputerName": "srv01", "Keywords": "Audit Success", "SubjectUserName": "alice", "TargetUserName": "svc"}
+{"_time": "2026-01-01T00:00:01.000-04:00", "sourcetype": "WinEventLog:Security", "host": "srv01", "EventCode": "4625", "ComputerName": "srv01", "Keywords": "Audit Failure", "SubjectUserName": "bob", "TargetUserName": "svc"}
+{"_time": "2026-01-01T00:00:02.000-04:00", "sourcetype": "WinEventLog:Security", "host": "srv02", "EventCode": "4672", "ComputerName": "srv02", "Keywords": "Audit Success", "SubjectUserName": "SYSTEM"}
+{"_time": "2026-01-01T00:00:03.000-04:00", "sourcetype": "Perfmon:CPU Load", "host": "srv01", "collection": "CPU Load", "object": "Processor", "counter": "% Processor Time", "instance": "_Total", "Value": "12.5"}
+{"_time": "2026-01-01T00:00:04.000-04:00", "sourcetype": "Perfmon:CPU Load", "host": "srv02", "collection": "CPU Load", "object": "Processor", "counter": "% Processor Time", "instance": "_Total", "Value": "40.1"}

@@ -52,11 +52,16 @@
 - Adapter: `{{ s.adapter }}`
 - Owner: {{ s.owner }}
 - Sample: {{ s.sample.actual_size }}/{{ s.sample.requested_size }} requested, strategy=`{{ s.sample.strategy }}`, seed={{ s.sample.seed }}, population={{ s.sample.population_size }}
+{% if s.log_profile %}
+- Log type: {{ s.log_profile.summary }}{% if s.log_profile.shortfalls %} -- {{ s.log_profile.shortfalls | length }} expected field(s) below expected presence (see Recommendations){% endif %}
+{% endif %}
 {% if s.envelope_hint %}
 **Note:** records look wrapped in an envelope key `{{ s.envelope_hint }}` -- the real fields sit one level down, so most checks below will miss them. For a file source, set `record_root: {{ s.envelope_hint }}` on this source to unwrap it and re-run.
-{% endif %}{% if s.parse_error_examples %}
+{% endif %}
+{% if s.parse_error_examples %}
 **Parse errors** (first few): {% for e in s.parse_error_examples %}`{{ e }}`{{ "; " if not loop.last }}{% endfor %}
 {% endif %}
+
 **Score:** {{ dim_score(s.verdict.completeness) }} (C6 excluded)
 
 **Automation eligibility:** {{ "ELIGIBLE" if s.verdict.eligibility.eligible else "**NOT ELIGIBLE**" }}
@@ -105,7 +110,8 @@ needs to act *safely*, and they come from enrichment, not the device.
 {% if r.remediation %}  - Add: {{ r.remediation.add_fields | join('; ') }}
   - Enables: {{ r.remediation.enables }}
   - Where: {{ r.remediation.where_labels | join('; ') }}
-{% endif %}{% endfor %}
+{% if r.remediation.guidance %}  - Guidance: {{ r.remediation.guidance | trim }}
+{% endif %}{% endif %}{% endfor %}
 {% else -%}
 None.
 {% endif %}

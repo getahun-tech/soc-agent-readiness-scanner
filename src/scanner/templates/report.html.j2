@@ -119,6 +119,7 @@
         adapter <code>{{ s.adapter }}</code> &middot;
         owner {{ s.owner }} &middot;
         sample {{ s.sample.actual_size }}/{{ s.sample.requested_size }} (strategy={{ s.sample.strategy }}, seed={{ s.sample.seed }}, population={{ s.sample.population_size }})
+        {% if s.log_profile %}<br>log type: {{ s.log_profile.summary }}{% if s.log_profile.shortfalls %} &mdash; {{ s.log_profile.shortfalls | length }} expected field(s) below expected presence (see Recommendations){% endif %}{% endif %}
       </div>
       {% if s.envelope_hint %}
       <div class="note"><strong>Note:</strong> records look wrapped in an envelope key <code>{{ s.envelope_hint }}</code> &mdash; the real fields sit one level down, so most checks below will miss them. For a file source, set <code>record_root: {{ s.envelope_hint }}</code> on this source to unwrap it and re-run.</div>
@@ -174,6 +175,7 @@
         <li><span class="k">Add:</span> {{ r.remediation.add_fields | join('; ') }}</li>
         <li><span class="k">Enables:</span> {{ r.remediation.enables }}</li>
         <li><span class="k">Where:</span> {{ r.remediation.where_labels | join('; ') }}</li>
+        {% if r.remediation.guidance %}<li><span class="k">Guidance:</span> {{ r.remediation.guidance | trim }}</li>{% endif %}
       </ul>
       {% endif %}
     </div>
