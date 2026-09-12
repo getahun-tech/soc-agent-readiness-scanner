@@ -13,6 +13,11 @@ def _fake_result():
         "sources": {
             "src_a": {
                 "sample": {"actual_size": 10},
+                "checks": {
+                    "C1": {"status": "PASS"},
+                    "C2": {"status": "WARN"},
+                    "C8": {"status": "NOT_ASSESSED"},
+                },
                 "verdict": {
                     "eligibility": {
                         "eligible": False,
@@ -35,6 +40,8 @@ def test_build_journal_entry_extracts_sample_sizes_and_verdicts():
     assert entry.verdicts["src_a"]["eligible"] is False
     assert entry.verdicts["src_a"]["failed_gates"] == ["C4"]
     assert entry.verdicts["src_a"]["completeness_score"] == "5/6"
+    # Per-check statuses ride along so the journal can serve as a diff baseline.
+    assert entry.verdicts["src_a"]["checks"] == {"C1": "PASS", "C2": "WARN", "C8": "NOT_ASSESSED"}
     # not_implemented/error sources have no verdict and are skipped, not KeyErrored.
     assert "splunk_source" not in entry.verdicts
 

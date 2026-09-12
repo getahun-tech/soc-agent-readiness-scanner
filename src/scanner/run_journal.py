@@ -38,10 +38,14 @@ def build_journal_entry(
         if v is None:
             continue
         comp, elig = v["completeness"], v["eligibility"]
+        checks = r.get("checks") or {}
         verdicts[name] = {
             "eligible": elig["eligible"],
             "completeness_score": f"{comp['score']}/{comp['denominator']}",
             "failed_gates": [g["gate_id"] for g in elig["gates"] if not g["passed"]],
+            # Per-check statuses make the journal a self-sufficient baseline
+            # for `scanner diff` / `--fail-on regression` (see diff.py).
+            "checks": {check_id: c["status"] for check_id, c in checks.items()},
         }
 
     return JournalEntry(

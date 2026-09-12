@@ -178,6 +178,45 @@ calendar, via enrichment.
 Recommendations are additive. They never feed scores or gates, so they
 can't turn into requirements by the back door.
 
+## Continuous use: drift detection and CI gates
+
+A single scan answers "is this source fit to automate against today?"
+The question that keeps a scanner installed is "did anything change?"
+— a firmware update that silently dropped the timezone from every
+timestamp, a logging-profile edit that removed the target field. Every
+`scan` writes a journal entry with each source's eligibility, score,
+and per-check statuses, and that journal is the baseline:
+
+```bash
+# On a schedule: fail the job if anything got worse than last time
+scanner scan --config scanner.yaml --fail-on regression
+
+# As an onboarding gate: fail if any source isn't automation-eligible
+scanner scan --config scanner.yaml --fail-on ineligible
+
+# What changed between the last two runs (add --exit-code for pipelines)
+scanner diff --config scanner.yaml
+```
+
+"Worse" is ranked, not just different: PASS → WARN, PASS → FAIL,
+WARN → FAIL, and an assessed check becoming NOT_ASSESSED (the timestamp
+field vanished, so C2 couldn't run) are regressions; FAIL ↔ NOT_ASSESSED
+is a lateral move and never trips a gate. Eligibility flipping to NOT
+ELIGIBLE is a regression that names the newly failing gates.
+
+Exit codes are distinct so a pipeline can tell a broken job from a real
+finding:
+
+| Code | Meaning |
+| --- | --- |
+| 0 | Scan completed; no requested policy failed. |
+| 1 | The scan itself did not complete (bad config, adapter error, a source that errored). |
+| 2 | The scan completed and the data failed a `--fail-on` policy. |
+
+The baseline is the previous journal entry with the same `--config`
+path string, so run scheduled scans from the same directory with the
+same path to keep one continuous history per config.
+
 ## Configuration
 
 See [CONFIG.md](CONFIG.md) for the full reference. `scanner

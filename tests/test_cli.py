@@ -173,6 +173,82 @@ def test_scan_html_output_is_byte_identical_across_runs(tmp_path):
     assert _normalize(r1.stdout) == _normalize(r2.stdout)
 
 
+# --- --fail-on and diff: CI gates against the journal ------------------------
+
+
+def test_fail_on_ineligible_exits_2_and_still_writes_the_report(tmp_path):
+    # The simple fixture WARNs on C2 (small skew), and the C2 gate needs PASS.
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    out = tmp_path / "report.json"
+    result = runner.invoke(
+        app, ["scan", "--config", str(cfg_path), "--output", str(out), "--fail-on", "ineligible"]
+    )
+    assert result.exit_code == 2
+    assert json.loads(out.read_text())["sources"]["test_source"]["status"] == "ok"
+
+
+def test_fail_on_rejects_unknown_policy_and_regression_without_journal(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    assert runner.invoke(app, ["scan", "--config", str(cfg_path), "--fail-on", "bogus"]).exit_code == 1
+    assert (
+        runner.invoke(
+            app, ["scan", "--config", str(cfg_path), "--fail-on", "regression", "--journal", ""]
+        ).exit_code
+        == 1
+    )
+
+
+def _write_records(path: Path, *, with_action: bool) -> None:
+    lines = []
+    for i in range(10):
+        rec = {"timestamp": f"2026-01-01T00:00:{i:02d}Z", "host": "web01", "user": "alice", "dst": "db01"}
+        if with_action:
+            rec["action"] = "login"
+        lines.append(json.dumps(rec))
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def test_fail_on_regression_compares_against_the_previous_run_of_the_same_config(tmp_path):
+    data = tmp_path / "data.jsonl"
+    journal = tmp_path / "journal.jsonl"
+    _write_records(data, with_action=True)
+    cfg_path = _write_config(tmp_path, str(data))
+    args = ["scan", "--config", str(cfg_path), "--journal", str(journal), "--fail-on", "regression"]
+
+    # First run: no baseline yet -> nothing to regress from.
+    first = runner.invoke(app, args)
+    assert first.exit_code == 0, first.output
+
+    # Same data again: a baseline exists and nothing changed.
+    second = runner.invoke(app, args)
+    assert second.exit_code == 0, second.output
+
+    # The event-type field disappears (a vendor "update"): C1 and C5 get worse.
+    _write_records(data, with_action=False)
+    third = runner.invoke(app, args)
+    assert third.exit_code == 2, third.output
+
+    # `scanner diff` reads the same journal and shows exactly that.
+    shown = runner.invoke(app, ["diff", "--journal", str(journal), "--config", str(cfg_path), "--exit-code"])
+    assert shown.exit_code == 2, shown.output
+    assert "test_source / C1: PASS -> FAIL" in shown.stdout
+    assert "test_source / C5: PASS -> FAIL" in shown.stdout
+    assert "## Regressions (2)" in shown.stdout
+
+    as_json = runner.invoke(app, ["diff", "--journal", str(journal), "--format", "json"])
+    assert as_json.exit_code == 0
+    assert json.loads(as_json.stdout)["has_regression"] is True
+
+
+def test_diff_needs_two_entries_and_an_existing_journal(tmp_path):
+    assert runner.invoke(app, ["diff", "--journal", str(tmp_path / "missing.jsonl")]).exit_code == 1
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    journal = tmp_path / "journal.jsonl"
+    runner.invoke(app, ["scan", "--config", str(cfg_path), "--journal", str(journal)])
+    only_one = runner.invoke(app, ["diff", "--journal", str(journal)])
+    assert only_one.exit_code == 1
+
+
 # --- quickscan: no config at all -------------------------------------------
 
 

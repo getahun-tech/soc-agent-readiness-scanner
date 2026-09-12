@@ -4,6 +4,7 @@ import getpass
 import hashlib
 import re
 import sys
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated
@@ -14,6 +15,7 @@ from pydantic import ValidationError
 from rich.console import Console
 
 from scanner.config import ConfigError, DefaultsConfig, ScannerConfig, SourceConfig, load_config
+from scanner.diff import RunDiff, diff_entries, find_baseline, load_journal, render_diff_markdown
 from scanner.exceptions import AdapterError
 from scanner.orchestrator import run_scan
 from scanner.renderers import render_html, render_json, render_markdown
@@ -32,6 +34,24 @@ _DEFAULT_JOURNAL_PATH = "./scanner_journal.jsonl"
 _QUICKSCAN_OWNER = "unknown (quickscan -- set owner: in a real config)"
 _EVENT_CLASSES = ("activity", "state", "mixed")
 _GLOB_CHARS = set("*?[")
+_FAIL_ON = ("ineligible", "regression")
+
+# Exit codes. 1 is "the scan itself did not complete" (adapter error,
+# bad config); 2 is "the scan completed and the data failed a policy you
+# asked for" -- distinct so a pipeline can tell a broken job from a real
+# finding.
+EXIT_INCOMPLETE = 1
+EXIT_POLICY = 2
+
+
+@dataclass
+class Outcome:
+    failed: list[str] = field(default_factory=list)
+    """Sources that did not complete."""
+    ineligible: list[str] = field(default_factory=list)
+    """Sources that completed and are not automation-eligible."""
+    diff: RunDiff | None = None
+    """Comparison against the previous journal entry; None when not journaling."""
 
 
 def _load_config_or_exit(config_path: str):
@@ -65,14 +85,14 @@ def _execute(
     output_format: str,
     operator: str | None,
     journal: str,
-) -> list[str]:
-    """Run, journal, render. Returns the names of sources that did not
-    complete, so the caller decides how to exit."""
+) -> Outcome:
+    """Run, diff against the journal, journal, render. Returns what the
+    caller needs to decide how to exit."""
     if output_format not in _RENDERERS:
         err_console.print(
             f"[bold red]--format must be one of {sorted(_RENDERERS)}, got '{output_format}'[/bold red]"
         )
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=EXIT_INCOMPLETE)
 
     resolved_operator = operator or _operator_identity()
     try:
@@ -85,8 +105,9 @@ def _execute(
         )
     except AdapterError as exc:
         err_console.print(f"[bold red]{exc}[/bold red]")
-        raise typer.Exit(code=1) from exc
+        raise typer.Exit(code=EXIT_INCOMPLETE) from exc
 
+    diff: RunDiff | None = None
     if journal:
         entry = build_journal_entry(
             result,
@@ -94,6 +115,16 @@ def _execute(
             config_path=config_path,
             config_hash=config_hash,
         )
+        # Baseline is read *before* this run is appended, so the diff is
+        # always "this run vs. the previous one for the same config".
+        baseline = None
+        if Path(journal).exists():
+            try:
+                baseline = find_baseline(load_journal(journal), config_path)
+            except ValueError as exc:
+                err_console.print(f"[bold red]{exc}[/bold red]")
+                raise typer.Exit(code=EXIT_INCOMPLETE) from exc
+        diff = diff_entries(baseline, entry.model_dump())
         append_journal_entry(journal, entry)
 
     payload = _RENDERERS[output_format](result, cfg)
@@ -106,15 +137,47 @@ def _execute(
     else:
         print(payload)
 
-    return [
-        name for name, r in result["sources"].items() if r["status"] in ("error", "not_implemented")
-    ]
+    if diff is not None and diff.baseline_timestamp is not None:
+        # stderr: informative, never part of the report payload.
+        err_console.print(
+            f"vs previous run ({diff.baseline_timestamp}): "
+            f"{len(diff.regressions)} regression(s), {len(diff.improvements)} improvement(s)"
+            + (f" -- {diff.note}" if diff.note else "")
+        )
+        for line in diff.regressions:
+            err_console.print(f"  [red]regression[/red] {line}")
+
+    return Outcome(
+        failed=[
+            name
+            for name, r in result["sources"].items()
+            if r["status"] in ("error", "not_implemented")
+        ],
+        ineligible=[
+            name
+            for name, r in result["sources"].items()
+            if r.get("verdict") and not r["verdict"]["eligibility"]["eligible"]
+        ],
+        diff=diff,
+    )
 
 
 def _exit_if_incomplete(failed: list[str]) -> None:
     if failed:
         err_console.print(f"[yellow]{len(failed)} source(s) did not complete: {failed}[/yellow]")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=EXIT_INCOMPLETE)
+
+
+def _exit_if_policy_failed(outcome: Outcome, fail_on: list[str]) -> None:
+    reasons: list[str] = []
+    if "ineligible" in fail_on and outcome.ineligible:
+        reasons.append(f"{len(outcome.ineligible)} source(s) not automation-eligible: {outcome.ineligible}")
+    if "regression" in fail_on and outcome.diff is not None and outcome.diff.has_regression:
+        reasons.append(f"{len(outcome.diff.regressions)} regression(s) vs the previous run")
+    if reasons:
+        for reason in reasons:
+            err_console.print(f"[bold red]--fail-on:[/bold red] {reason}")
+        raise typer.Exit(code=EXIT_POLICY)
 
 
 @app.command(name="validate-config")
@@ -152,15 +215,38 @@ def scan(
         str,
         typer.Option("--journal", help="Append-only run journal path. Set to '' to skip journaling."),
     ] = _DEFAULT_JOURNAL_PATH,
+    fail_on: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--fail-on",
+            help=(
+                "Exit 2 if the data fails a policy (repeatable): 'ineligible' -- any "
+                "scanned source is not automation-eligible; 'regression' -- any check or "
+                "eligibility got worse than the previous journal entry for this config."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """Sample configured sources, run every check, score, and report."""
+    fail_on = fail_on or []
+    bad = [f for f in fail_on if f not in _FAIL_ON]
+    if bad:
+        err_console.print(f"[bold red]--fail-on must be one of {list(_FAIL_ON)}, got {bad}[/bold red]")
+        raise typer.Exit(code=EXIT_INCOMPLETE)
+    if "regression" in fail_on and not journal:
+        err_console.print(
+            "[bold red]--fail-on regression needs the journal[/bold red] -- the baseline is the "
+            "previous journal entry for this config; don't pass --journal ''"
+        )
+        raise typer.Exit(code=EXIT_INCOMPLETE)
+
     cfg = _load_config_or_exit(config)
     config_hash = None
     config_file = Path(config)
     if config_file.exists():
         config_hash = hashlib.sha256(config_file.read_bytes()).hexdigest()[:16]
 
-    failed = _execute(
+    outcome = _execute(
         cfg,
         config_path=config,
         config_hash=config_hash,
@@ -170,7 +256,57 @@ def scan(
         operator=operator,
         journal=journal,
     )
-    _exit_if_incomplete(failed)
+    _exit_if_incomplete(outcome.failed)
+    _exit_if_policy_failed(outcome, fail_on)
+
+
+@app.command(name="diff")
+def diff(
+    journal: Annotated[
+        str,
+        typer.Option("--journal", help="Run journal to read"),
+    ] = _DEFAULT_JOURNAL_PATH,
+    config: Annotated[
+        str | None,
+        typer.Option(
+            "--config",
+            help="Compare only entries for this config path (as given to `scan --config`). "
+            "Default: the last two entries in the journal, whatever their config.",
+        ),
+    ] = None,
+    output_format: Annotated[
+        str, typer.Option("--format", help="Output format: 'markdown' or 'json'")
+    ] = "markdown",
+    exit_code: Annotated[
+        bool,
+        typer.Option("--exit-code", help="Exit 2 if there are regressions (like `git diff --exit-code`)."),
+    ] = False,
+) -> None:
+    """Show what changed between the last two journaled runs."""
+    if output_format not in ("markdown", "json"):
+        err_console.print(f"[bold red]--format must be 'markdown' or 'json', got '{output_format}'[/bold red]")
+        raise typer.Exit(code=EXIT_INCOMPLETE)
+    if not Path(journal).exists():
+        err_console.print(f"[bold red]journal not found:[/bold red] {journal}")
+        raise typer.Exit(code=EXIT_INCOMPLETE)
+    try:
+        entries = load_journal(journal)
+    except ValueError as exc:
+        err_console.print(f"[bold red]{exc}[/bold red]")
+        raise typer.Exit(code=EXIT_INCOMPLETE) from exc
+    if config is not None:
+        entries = [e for e in entries if e.get("config_path") == config]
+    if len(entries) < 2:
+        err_console.print(
+            f"[bold red]need at least two journal entries to diff[/bold red] "
+            f"(found {len(entries)}{f' for config {config!r}' if config else ''})"
+        )
+        raise typer.Exit(code=EXIT_INCOMPLETE)
+
+    result = diff_entries(entries[-2], entries[-1])
+    print(result.model_dump_json(indent=2) if output_format == "json" else render_diff_markdown(result), end="")
+    if exit_code and result.has_regression:
+        raise typer.Exit(code=EXIT_POLICY)
 
 
 def _quickscan_source_name(path: str, used: set[str]) -> str:
@@ -303,7 +439,7 @@ def quickscan(
             "[dim]Tip: add --emit-config scanner.yaml to save this run as a reusable config.[/dim]"
         )
 
-    failed = _execute(
+    outcome = _execute(
         cfg,
         config_path="quickscan",
         config_hash=None,
@@ -313,7 +449,7 @@ def quickscan(
         operator=operator,
         journal=journal,
     )
-    _exit_if_incomplete(failed)
+    _exit_if_incomplete(outcome.failed)
 
 
 def main() -> None:
