@@ -20,7 +20,6 @@ option in this document is then a change to that file.
 | --- | --- | --- | --- |
 | `version` | string | yes | Config schema version (informational; recorded in run metadata). |
 | `ruleset_version` | string | yes | Your own version label for this ruleset/config generation (informational; recorded in run metadata and the run journal). |
-| `inventory` | [InventoryConfig](#inventory) | no | Asset inventory used by origin resolution and C4. Omitting it is valid — without it, origin resolution assumes a field's presence is truthful rather than verifying it against known assets; with it, an actual match is required for the `attributable_rate` figure the eligibility gates use. |
 | `defaults` | [DefaultsConfig](#defaults) | no | Default sampling behavior, overridable per source. |
 | `field_hints` | [FieldHints](#field_hints) | no | Candidate field names checks use to locate origin/affected/outcome/correlation/actor fields. |
 | `sources` | list of [SourceConfig](#sources) | yes | The sources to scan. Names must be unique. |
@@ -28,25 +27,6 @@ option in this document is then a change to that file.
 | `splunk` | [SplunkConnectionConfig](#splunk) | conditionally | Connection details shared by every `adapter: splunk` source. **Required** if any source uses `adapter: splunk`; the config is rejected at validation time otherwise. |
 | `sentinel` | [SentinelConnectionConfig](#sentinel) | conditionally | Connection details shared by every `adapter: sentinel` source. **Required** if any source uses `adapter: sentinel`. |
 | `elastic` | [ElasticConnectionConfig](#elastic) | conditionally | Connection details shared by every `adapter: elastic` source. **Required** if any source uses `adapter: elastic`. |
-
-## `inventory`
-
-```yaml
-inventory:
-  path: ./samples/inventory/assets.csv
-  match_fields: [hostname, serial, mgmt_ip]
-```
-
-| Field | Type | Default | Description |
-| --- | --- | --- | --- |
-| `path` | string | none | Path to a CSV asset inventory. |
-| `match_fields` | list of string | `[]` | Which CSV columns to match record identifiers against. If empty, all columns in the CSV header are used. |
-
-Matching is case-insensitive, exact-value string matching against the
-union of all `match_fields` columns. There's one resolver per scan,
-reused independently for origin resolution and C4 (affected entity) —
-the two resolutions never share state beyond the loaded inventory
-itself.
 
 ## `defaults`
 

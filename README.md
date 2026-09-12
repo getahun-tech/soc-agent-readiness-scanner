@@ -133,8 +133,8 @@ A few checks carry design decisions worth knowing about beyond the table above:
   eligibility; the gate set stays frozen at C2/C4/C5.
 - Every check evidences its findings with concrete counts, percentages,
   or examples. "Attribution could be improved" is not acceptable output
-  from this tool; "67% of records could not be attributed to a known
-  asset (6,712 of 10,000 sampled)" is the bar.
+  from this tool; "67% of records carry no affected-entity field
+  (6,712 of 10,000 sampled)" is the bar.
 
 ## Automation eligibility
 
@@ -172,8 +172,8 @@ fields an agent needs to act *safely*: a `maintenance_window` flag (so
 it doesn't "remediate" a host that is intentionally down), an
 `environment` tag (prod vs. dev), and `asset_criticality`. These are
 never scored — they aren't completeness deficiencies, and they almost
-never come from the device. They come from the asset inventory or the
-change calendar, via enrichment.
+never come from the device. They come from a CMDB or the change
+calendar, via enrichment.
 
 Recommendations are additive. They never feed scores or gates, so they
 can't turn into requirements by the back door.

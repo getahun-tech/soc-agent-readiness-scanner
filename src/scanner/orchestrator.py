@@ -18,7 +18,6 @@ from scanner.adapters.elastic import ElasticAdapter
 from scanner.adapters.file import FileAdapter
 from scanner.adapters.sentinel import SentinelAdapter
 from scanner.adapters.splunk import SplunkAdapter
-from scanner.asset_resolver import AssetResolver
 from scanner.checks.base import CheckContext, CheckResult
 from scanner.checks.completeness import COMPLETENESS_CHECKS
 from scanner.config import ScannerConfig
@@ -29,6 +28,7 @@ from scanner.estate import (
     detect_conflicts,
 )
 from scanner.exceptions import AdapterError
+from scanner.identifier_resolver import IdentifierResolver
 from scanner.profiler import Profiler
 from scanner.scoring import CompletenessScorer
 
@@ -58,13 +58,10 @@ def run_scan(
 
     profiler = Profiler()
     scorer = CompletenessScorer()
-    # One resolver, reused for both origin and affected-entity (C4) lookups --
-    # it caches inventory loading internally; the two resolve() calls stay
-    # independent because each takes its own candidate field list.
-    asset_resolver = AssetResolver(
-        config.inventory.path if config.inventory else None,
-        config.inventory.match_fields if config.inventory else [],
-    )
+    # One resolver, reused for both origin and affected-entity (C4) lookups;
+    # the two resolve() calls stay independent because each takes its own
+    # candidate field list.
+    resolver = IdentifierResolver()
     results: dict[str, Any] = {}
     entries: list[SourceEntry] = []
 
@@ -98,8 +95,8 @@ def run_scan(
             }
             continue
 
-        origin_resolution = asset_resolver.resolve(records, config.field_hints.origin)
-        affected_resolution = asset_resolver.resolve(records, config.field_hints.affected)
+        origin_resolution = resolver.resolve(records, config.field_hints.origin)
+        affected_resolution = resolver.resolve(records, config.field_hints.affected)
         ctx = CheckContext(
             source=source,
             config=config,

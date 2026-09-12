@@ -1,4 +1,0 @@
-hostname,serial,mgmt_ip
-web01,SN-001,10.1.1.1
-fw01,SN-010,10.1.1.10
-fw03,SN-012,10.1.1.12

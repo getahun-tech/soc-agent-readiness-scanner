@@ -9,10 +9,6 @@
 version: "1.0"
 ruleset_version: "2026.07"
 
-inventory:
-  path: ./samples/inventory/assets.csv
-  match_fields: [hostname, serial]
-
 defaults:
   sample_size: 2000
   sample_strategy: random
@@ -47,10 +43,8 @@ sources:
   - name: pii_proxy_logs
     adapter: file
     path: ./samples/pii_proxy_logs/*.jsonl
-    # The proxy hosts aren't in the inventory, but the record content itself
-    # (event type, timestamp, entities, outcome, correlation key) is fully
-    # complete -- demonstrates a source that's completeness-strong even
-    # without inventory-backed attribution. Proxy requests are user actions,
+    # The record content (event type, timestamp, entities, outcome,
+    # correlation key) is fully complete. Proxy requests are user actions,
     # so event_class: activity opts this source into C8 (actor) scoring.
     event_class: activity
     owner: "web-proxy-team@example.com"

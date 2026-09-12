@@ -134,9 +134,9 @@ def remediation_for(result: CheckResult) -> Remediation | None:
 
 
 # Context fields an agent needs to act *safely* that almost never come
-# from the device -- they come from the asset inventory or the change
-# calendar, and reach the record via enrichment. Checked for presence
-# only; never scored.
+# from the device -- they come from a CMDB or the change calendar, and
+# reach the record via enrichment. Checked for presence only; never
+# scored.
 CONTEXT_FIELDS: list[tuple[str, list[str], str]] = [
     (
         "maintenance_window",

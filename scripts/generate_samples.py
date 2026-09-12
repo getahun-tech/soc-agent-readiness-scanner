@@ -253,38 +253,6 @@ def gen_skewed_clocks(n: int = 1000) -> list[dict]:
     return records
 
 
-# --- inventory ---------------------------------------------------------
-
-
-def gen_inventory() -> list[dict]:
-    rows = []
-    # clean_firewall origins: fully covered.
-    rows += [{"hostname": f"fw{i:02d}", "serial": f"SN-FW-{i:03d}"} for i in range(1, 11)]
-    # ambiguous_nodedown reporting devices: covered (targets deliberately are not --
-    # they're monitored nodes, not inventoried assets).
-    rows += [{"hostname": f"poller{i:02d}", "serial": f"SN-PL-{i:03d}"} for i in range(1, 4)]
-    # conflicting_pair shared switches: covered.
-    rows += [{"hostname": f"sw{i:02d}", "serial": f"SN-SW-{i:03d}"} for i in range(1, 11)]
-    # origin_only_logs origins: covered (this source has no affected-entity
-    # field at all, so this is the only resolution that applies to it).
-    rows += [{"hostname": f"origin{i:02d}", "serial": f"SN-OR-{i:03d}"} for i in range(1, 21)]
-    # skewed_clocks pollers: covered.
-    rows += [{"hostname": h, "serial": f"SN-{h.upper()}"} for h in ("dc1-poller", "dc2-poller", "dc3-poller")]
-    # pii_proxy_logs proxy hosts deliberately NOT included -- origin inventory
-    # resolution should FAIL for that source, demonstrating a source that's
-    # completeness-strong but still needs inventory work.
-    return rows
-
-
-def write_inventory_csv(rows: list[dict]) -> None:
-    path = SAMPLES / "inventory" / "assets.csv"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="\n") as f:
-        f.write("hostname,serial\n")
-        for row in rows:
-            f.write(f"{row['hostname']},{row['serial']}\n")
-
-
 def main() -> None:
     write_jsonl(SAMPLES / "clean_firewall" / "firewall.jsonl", gen_clean_firewall())
     write_lines(SAMPLES / "broken_syslog" / "syslog.log", gen_broken_syslog())
@@ -297,8 +265,6 @@ def main() -> None:
 
     write_jsonl(SAMPLES / "origin_only_logs" / "origin_only.jsonl", gen_origin_only_logs())
     write_jsonl(SAMPLES / "skewed_clocks" / "skewed.jsonl", gen_skewed_clocks())
-
-    write_inventory_csv(gen_inventory())
     print("Sample data generated under", SAMPLES)
 
 

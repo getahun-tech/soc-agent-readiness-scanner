@@ -2,17 +2,13 @@
 
 Origin resolution (`ctx.origin_resolution`) asks who generated the record;
 C4 asks who it happened to. This class must never be a thin wrapper
-around origin resolution -- it runs its own `AssetResolver.resolve()`
-call against `field_hints.affected` (see `ctx.affected_resolution`),
+around origin resolution -- it reads its own `IdentifierResolver.resolve()`
+result against `field_hints.affected` (see `ctx.affected_resolution`),
 independent of `ctx.origin_resolution`, so a source can be well-attributed
 to its reporting device but still FAIL here (or the reverse).
 
-"Identifiable" for C4's own PASS/WARN/FAIL bands means *present in the
-sample*, not *resolved against the inventory* -- inventory resolution is
-reported alongside as supplementary evidence (mirroring origin
-resolution's match_rate) but does not gate this check, since a
-remediation agent needs to know *what* was affected before inventory
-lookup is even relevant.
+"Identifiable" means *present in the sample*: a remediation agent needs
+to know *what* was affected, and a present value is assumed truthful.
 """
 
 from __future__ import annotations
@@ -24,6 +20,7 @@ _ORIGIN_C4_DISTINCTION = (
     "affected entity cannot be reliably identified (C4 FAIL). Automated action "
     "requires knowing what to act on, not only what reported it."
 )
+_WELL_ATTRIBUTED_ORIGIN_RATE = 0.95
 
 
 class C4AffectedEntity(Check):
@@ -43,14 +40,16 @@ class C4AffectedEntity(Check):
                 records_total=0,
             )
 
+        origin_well_attributed = ctx.origin_resolution.presence_rate >= _WELL_ATTRIBUTED_ORIGIN_RATE
+
         if res.identifier_field is None:
             findings = [
-                f"no affected-entity identifier found: {res.inventory_note or 'field not present in sample'}"
+                f"no affected-entity identifier found: {res.note or 'field not present in sample'}"
             ]
             # A completely absent affected-entity field is the canonical case
             # for the origin/C4 distinction, not a lesser one -- this must
             # fire here too, not only when the field is present-but-thin.
-            if ctx.origin_resolution.attributable_rate >= 0.95:
+            if origin_well_attributed:
                 findings.append(_ORIGIN_C4_DISTINCTION)
             return self.result(
                 "FAIL",
@@ -83,16 +82,10 @@ class C4AffectedEntity(Check):
                 f"and affected-entity (C4) identifier -- the scanner cannot tell what "
                 f"reported the event apart from what it happened to"
             )
-        if res.inventory_loaded:
-            findings.append(
-                f"inventory resolution (separate from origin resolution): "
-                f"{res.matched_count}/{res.presence_count} present values matched a known "
-                f"asset ({(res.match_rate or 0.0):.1%})"
-            )
 
         # Origin/C4 divergence is the single most commonly misread result in this
         # report -- spell it out whenever it applies.
-        if ctx.origin_resolution.attributable_rate >= 0.95 and status == "FAIL":
+        if origin_well_attributed and status == "FAIL":
             findings.append(_ORIGIN_C4_DISTINCTION)
 
         return self.result(
@@ -104,9 +97,6 @@ class C4AffectedEntity(Check):
                 "presence_count": res.presence_count,
                 "identifiable_rate": identifiable_rate,
                 "distinguishable_from_origin": distinguishable,
-                "inventory_loaded": res.inventory_loaded,
-                "matched_count": res.matched_count,
-                "match_rate": res.match_rate,
             },
             records_passed=res.presence_count,
             records_total=record_count,

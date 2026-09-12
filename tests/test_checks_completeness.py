@@ -123,12 +123,12 @@ def test_c4_warn_on_partial_presence():
 
 
 def test_c4_fail_states_origin_c4_distinction_when_origin_is_well_attributed():
+    # 'src' is present in every record (origin well attributed); 'dst' is
+    # present in too few for C4 to pass.
     ctx = _ctx(
         str(FIXTURES / "affected_low" / "records.jsonl"),
         origin_hints=["src"],
         affected_hints=["dst"],
-        inventory_path=str(FIXTURES / "affected_low" / "inventory.csv"),
-        match_fields=["hostname"],
     )
     r = C4AffectedEntity().run(ctx)
     assert r.status == "FAIL"
@@ -143,8 +143,6 @@ def test_c4_fail_states_origin_c4_distinction_when_affected_field_is_completely_
         str(FIXTURES / "attribution" / "records.jsonl"),
         origin_hints=["host"],
         affected_hints=["does_not_exist_in_records"],
-        inventory_path=str(FIXTURES / "attribution" / "inventory_full.csv"),
-        match_fields=["hostname"],
     )
     r = C4AffectedEntity().run(ctx)
     assert r.status == "FAIL"

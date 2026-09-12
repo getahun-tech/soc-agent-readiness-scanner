@@ -26,11 +26,6 @@ knows which kind of source this is -- that's why this is declared, never
 inferred from the data."""
 
 
-class InventoryConfig(BaseModel):
-    path: str | None = None
-    match_fields: list[str] = Field(default_factory=list)
-
-
 # Built-in field_hints defaults, so a config that omits field_hints entirely
 # still gets reasonable C4/C5/C7/C8 behavior out of the box -- these are the
 # ONLY defaults FieldHints itself carries; C1's event-type candidates are
@@ -374,7 +369,6 @@ class PrecedenceRule(BaseModel):
 class ScannerConfig(BaseModel):
     version: str
     ruleset_version: str
-    inventory: InventoryConfig | None = None
     defaults: DefaultsConfig = Field(default_factory=DefaultsConfig)
     field_hints: FieldHints = Field(default_factory=FieldHints)
     sources: list[SourceConfig]

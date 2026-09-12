@@ -166,8 +166,8 @@ def build_recommendations(entries: list[SourceEntry]) -> list[Recommendation]:
                     finding=(
                         "no agent-context field present: "
                         + ", ".join(name for name, _ in missing)
-                        + " -- not a completeness deficiency; these come from the asset "
-                        "inventory or change calendar, not the device"
+                        + " -- not a completeness deficiency; these come from a CMDB or "
+                        "change calendar, not the device"
                     ),
                     remediation=Remediation(
                         add_fields=[f"{name} -- {why}" for name, why in missing],

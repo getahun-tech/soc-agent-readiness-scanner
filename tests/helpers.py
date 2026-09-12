@@ -5,9 +5,9 @@ file, without going through the full orchestrator.
 from __future__ import annotations
 
 from scanner.adapters.file import FileAdapter
-from scanner.asset_resolver import AssetResolver
 from scanner.checks.base import CheckContext
 from scanner.config import DefaultsConfig, FieldHints, PrecedenceRule, ScannerConfig, SourceConfig
+from scanner.identifier_resolver import IdentifierResolver
 from scanner.profiler import Profiler
 
 
@@ -17,8 +17,6 @@ def build_ctx(
     sample_size: int = 100,
     sample_strategy: str = "random",
     seed: int = 1,
-    inventory_path: str | None = None,
-    match_fields: list[str] | None = None,
     origin_hints: list[str] | None = None,
     affected_hints: list[str] | None = None,
     outcome_hints: list[str] | None = None,
@@ -61,7 +59,7 @@ def build_ctx(
     records_iter, _ = FileAdapter().fetch_sample(source, cfg)
     records = list(records_iter)
     profile = Profiler().profile(source.name, records)
-    resolver = AssetResolver(inventory_path, match_fields or [])
+    resolver = IdentifierResolver()
     origin_resolution = resolver.resolve(records, origin_hints)
     affected_resolution = resolver.resolve(records, affected_hints)
     return CheckContext(

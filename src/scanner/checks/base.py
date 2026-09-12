@@ -13,8 +13,8 @@ from typing import Any, ClassVar, Literal
 
 from pydantic import BaseModel, computed_field
 
-from scanner.asset_resolver import AttributionResult
 from scanner.config import ScannerConfig, SourceConfig
+from scanner.identifier_resolver import IdentifierResolution
 from scanner.models import RawRecord
 from scanner.profiler import ProfileResult
 
@@ -67,12 +67,12 @@ class CheckContext:
     config: ScannerConfig
     profile: ProfileResult
     records: list[RawRecord]
-    origin_resolution: AttributionResult
+    origin_resolution: IdentifierResolution
     """Resolution of the *origin* (reporting device) identifier."""
-    affected_resolution: AttributionResult
+    affected_resolution: IdentifierResolution
     """Resolution of the *affected entity* (target/subject) identifier -- C4.
 
-    Deliberately a separate AssetResolver.resolve() call against
+    Deliberately a separate IdentifierResolver.resolve() call against
     `field_hints.affected`, never derived from `origin_resolution`. Origin
     and affected-entity resolution answer different questions and must be
     able to disagree (e.g. well-attributed device, unidentifiable target).
