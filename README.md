@@ -217,6 +217,17 @@ The baseline is the previous journal entry with the same `--config`
 path string, so run scheduled scans from the same directory with the
 same path to keep one continuous history per config.
 
+## Standards mapping
+
+Most logging standards require the same record content in different
+words — what happened, when, where, to what, by whom, with what outcome.
+[STANDARDS.md](STANDARDS.md) maps each check to the requirement it
+evidences in NIST SP 800-53 (AU-3, AU-8), PCI DSS v4.0 (Req. 10.2.2),
+OMB M-21-31, and NIST SP 800-92, and to the MITRE ATT&CK data components
+a source's fields make usable — plus an explicit list of what the tool
+does *not* cover (retention, integrity, review, coverage), so a report
+is filed as evidence for the right things and nothing else.
+
 ## Configuration
 
 See [CONFIG.md](CONFIG.md) for the full reference. `scanner
