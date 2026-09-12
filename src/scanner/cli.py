@@ -19,7 +19,7 @@ from scanner.diff import RunDiff, diff_entries, find_baseline, load_journal, ren
 from scanner.exceptions import AdapterError
 from scanner.orchestrator import run_scan
 from scanner.profiles import ProfileError, ProfileRegistry
-from scanner.renderers import render_html, render_json, render_markdown
+from scanner.renderers import render_html, render_json, render_jsonl, render_markdown
 from scanner.run_journal import append_journal_entry, build_journal_entry
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
@@ -30,6 +30,7 @@ _RENDERERS = {
     "json": lambda result, cfg: render_json(result),
     "markdown": render_markdown,
     "html": render_html,
+    "jsonl": render_jsonl,
 }
 _DEFAULT_JOURNAL_PATH = "./scanner_journal.jsonl"
 _QUICKSCAN_OWNER = "unknown (quickscan -- set owner: in a real config)"
@@ -206,7 +207,13 @@ def scan(
     ] = None,
     output_format: Annotated[
         str,
-        typer.Option("--format", help="Output format: 'json', 'markdown', or 'html'"),
+        typer.Option(
+            "--format",
+            help=(
+                "Output format: 'json' (one report document), 'markdown', 'html', or "
+                "'jsonl' (one event per line, for re-ingestion into a SIEM -- see README)."
+            ),
+        ),
     ] = "json",
     operator: Annotated[
         str | None,
@@ -397,7 +404,13 @@ def quickscan(
     ] = None,
     output_format: Annotated[
         str,
-        typer.Option("--format", help="Output format: 'json', 'markdown', or 'html'"),
+        typer.Option(
+            "--format",
+            help=(
+                "Output format: 'json' (one report document), 'markdown', 'html', or "
+                "'jsonl' (one event per line, for re-ingestion into a SIEM -- see README)."
+            ),
+        ),
     ] = "markdown",
     record_root: Annotated[
         str | None,

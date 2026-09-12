@@ -173,6 +173,26 @@ def test_scan_html_output_is_byte_identical_across_runs(tmp_path):
     assert _normalize(r1.stdout) == _normalize(r2.stdout)
 
 
+def test_scan_produces_jsonl_report_one_event_per_line(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "simple" / "records.jsonl"))
+    result = runner.invoke(app, ["scan", "--config", str(cfg_path), "--format", "jsonl"])
+    assert result.exit_code == 0, result.output
+    lines = [json.loads(line) for line in result.stdout.rstrip("\n").split("\n")]
+    assert lines  # at least the 'scan' event
+    assert lines[0]["event_type"] == "scan"
+    assert any(e["event_type"] == "source_summary" and e["source"] == "test_source" for e in lines)
+    assert any(e["event_type"] == "check_result" for e in lines)
+    run_ids = {e["run_id"] for e in lines}
+    assert len(run_ids) == 1  # every line from this invocation ties together
+
+
+def test_scan_jsonl_output_is_byte_identical_across_runs(tmp_path):
+    cfg_path = _write_config(tmp_path, str(FIXTURES / "mixed_formats" / "*.log"))
+    r1 = runner.invoke(app, ["scan", "--config", str(cfg_path), "--format", "jsonl"])
+    r2 = runner.invoke(app, ["scan", "--config", str(cfg_path), "--format", "jsonl"])
+    assert _normalize(r1.stdout) == _normalize(r2.stdout)
+
+
 # --- --fail-on and diff: CI gates against the journal ------------------------
 
 

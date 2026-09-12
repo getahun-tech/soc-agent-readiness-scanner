@@ -217,6 +217,29 @@ The baseline is the previous journal entry with the same `--config`
 path string, so run scheduled scans from the same directory with the
 same path to keep one continuous history per config.
 
+## Feeding results back into a SIEM
+
+A report is for a person reading it once. `--format jsonl` is for a
+dashboard: one self-contained JSON event per line, so a scheduled scan
+can be piped straight into whatever the audience already watches
+instead of producing a document that goes stale the moment it's read.
+
+```bash
+scanner scan --config scanner.yaml --format jsonl --journal "" \
+  | curl -s https://<splunk-host>:8088/services/collector/raw \
+      -H "Authorization: Splunk <hec-token>" --data-binary @-
+```
+
+Every line carries `event_type` so one index holds all of them and a
+query filters on it — `scan` (one per run), `source_summary` (one per
+source: score, eligibility, failed gates, sample), `check_result` (one
+per check per completed source — this is what a completeness-over-time
+chart is built from), `conflict`, and `recommendation`. Every line also
+carries `time` (so the SIEM's own time-based indexing needs no extra
+configuration) and `run_id`, so every line from one invocation can be
+grouped back together after ingestion — `stats by run_id` in Splunk, or
+`summarize by RunId` in a KQL table, ties a run's events into one view.
+
 ## Log-type profiles
 
 The generic checks judge every source against one set of expectations.
