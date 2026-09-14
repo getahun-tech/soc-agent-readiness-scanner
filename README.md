@@ -37,6 +37,22 @@ See [SECURITY.md](SECURITY.md) for the full list of security
 commitments and [§ roadmap](#roadmap--explicitly-deferred) for what's
 intentionally not built yet.
 
+## Disclaimer
+
+This tool reports a judgment over a bounded sample of data — not a
+guarantee, a certification, or a substitute for a qualified person's
+review. An ELIGIBLE verdict means the sampled records cleared a
+defined set of checks; it does not mean the source is error-free, that
+the report is 100% accurate, that automation against it is safe in
+every circumstance, or that the tool has seen every record that source
+will ever produce.
+
+Decisions to automate — or not automate — against any source are yours
+alone. This project is provided "AS IS," without warranty of any kind,
+and the authors accept no liability for outcomes arising from its use
+or from decisions made based on its output. See [LICENSE](LICENSE) for
+the full legal terms.
+
 ## Quickstart
 
 No config needed for a first look — point it at a file:
