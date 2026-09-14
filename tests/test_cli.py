@@ -294,7 +294,7 @@ def test_quickscan_needs_no_config_and_does_not_journal_by_default(tmp_path):
 def test_quickscan_defaults_to_markdown():
     result = runner.invoke(app, ["quickscan", str(FIXTURES / "simple" / "records.jsonl")])
     assert result.exit_code == 0, result.output
-    assert "# Event Log Completeness Scanner Report" in result.stdout
+    assert "# SOC Agent Readiness Scanner Report" in result.stdout
     assert "### records" in result.stdout
 
 

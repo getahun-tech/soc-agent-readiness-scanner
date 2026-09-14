@@ -1,4 +1,4 @@
-"""Event Log Completeness Scanner.
+"""SOC Agent Readiness Scanner.
 
 Scores telemetry sources against the C1-C8 completeness checks and
 reports automation eligibility. See README.md.

@@ -1,4 +1,4 @@
-# Event Log Completeness Scanner
+# SOC Agent Readiness Scanner
 
 Before a security or IT operations team lets a log source drive an
 automated decision — an auto-remediation, an auto-suppression, a

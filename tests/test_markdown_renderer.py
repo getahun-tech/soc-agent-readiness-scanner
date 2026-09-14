@@ -35,7 +35,7 @@ def test_render_markdown_includes_run_metadata_and_check_findings():
     result = run_scan(cfg, config_path="cfg.yaml")
     md = render_markdown(result, cfg)
 
-    assert "# Event Log Completeness Scanner Report" in md
+    assert "# SOC Agent Readiness Scanner Report" in md
     assert "clean_source" in md
     assert "C1 -- Event identification" in md
     assert "C4 -- Affected entity" in md
