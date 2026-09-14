@@ -1,0 +1,44 @@
+# Starter config for scanning a live Splunk source. Copy this file,
+# replace every <...> placeholder, then:
+#
+#   pip install -e ".[splunk]"
+#   scanner validate-config --config splunk.yaml   # catches typos first
+#   $env:SPLUNK_TOKEN = "<your token>"              # PowerShell; set in the
+#                                                    # shell, never in a file
+#   scanner scan --config splunk.yaml --format markdown
+#
+# See CONFIG.md ("splunk" section) for every field, and SECURITY.md for
+# the read-only guarantee and credential-handling rules this relies on.
+
+version: "1.0"
+ruleset_version: "1"
+
+splunk:
+  host: "<your-splunk-host>"          # e.g. splunk.example.com
+  port: 8089                          # Splunk's management port, not 8000/8089 for search UI
+  scheme: https
+  auth: token                         # token (recommended) | session -- see CONFIG.md if
+                                       # your Splunk install rejects its own tokens
+  token_env_var: SPLUNK_TOKEN         # the token itself goes in the environment, not here
+  verify_ssl: true                    # set false only for a self-signed cert you trust
+
+defaults:
+  sample_size: 2000
+  sample_strategy: recent             # cheapest strategy against a live server -- no
+                                       # oversampling needed (see CONFIG.md for "random")
+  seed: 42
+
+sources:
+  - name: "<a-short-name-for-this-source>"   # used as the key everywhere in the report
+    adapter: splunk
+    query: 'index=<your-index> sourcetype="<your-sourcetype>"'   # SPL; a bounding
+                                                                   # `| head N` is added
+                                                                   # automatically
+    # event_class: activity   # uncomment + set if this sourcetype has an actor
+                               # (a person/process that did something) -- see
+                               # README.md "The checks" (C8) for activity/state/mixed
+    owner: "<team-or-person-who-owns-fixes-for-this-source>@example.com"
+
+# Add one more `- name: ...` entry per sourcetype you want scored separately --
+# a single query that mixes sourcetypes gets flagged as "mixed log types" rather
+# than scored against any one profile (see PROFILES.md).

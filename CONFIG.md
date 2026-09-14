@@ -202,6 +202,9 @@ see `conflicting_pair_solarwinds` / `conflicting_pair_meraki` in
 
 ## `splunk`
 
+A ready-to-copy starter config with every field commented is
+[`examples/splunk.yaml`](examples/splunk.yaml).
+
 ```yaml
 splunk:
   host: "splunk.example.com"
@@ -248,6 +251,9 @@ reject tokens they issued themselves). If you use it:
 
 ## `sentinel`
 
+A ready-to-copy starter config with every field commented is
+[`examples/sentinel.yaml`](examples/sentinel.yaml).
+
 ```yaml
 sentinel:
   workspace_id: "00000000-0000-0000-0000-000000000000"
@@ -267,6 +273,9 @@ As with Splunk, there is deliberately no `client_secret` field. Requires
 the `sentinel` optional extra: `pip install -e ".[sentinel]"`.
 
 ## `elastic`
+
+A ready-to-copy starter config with every field commented is
+[`examples/elastic.yaml`](examples/elastic.yaml).
 
 ```yaml
 elastic:

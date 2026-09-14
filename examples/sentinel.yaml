@@ -1,0 +1,46 @@
+# Starter config for scanning a live Microsoft Sentinel / Log Analytics
+# source. Copy this file, replace every <...> placeholder, then:
+#
+#   pip install -e ".[sentinel]"
+#   scanner validate-config --config sentinel.yaml   # catches typos first
+#   $env:SENTINEL_CLIENT_SECRET = "<your client secret>"   # PowerShell; set in
+#                                                           # the shell, never in a file
+#   scanner scan --config sentinel.yaml --format markdown
+#
+# See CONFIG.md ("sentinel" section) for every field, and SECURITY.md for
+# the read-only guarantee and credential-handling rules this relies on.
+#
+# Auth is Azure AD client-credentials: register an app (service principal),
+# grant it Log Analytics Reader on the workspace -- nothing more -- and use
+# its IDs and secret below.
+
+version: "1.0"
+ruleset_version: "1"
+
+sentinel:
+  workspace_id: "<your-log-analytics-workspace-id>"
+  tenant_id: "<your-azure-ad-tenant-id>"
+  client_id: "<your-app-registration-client-id>"
+  client_secret_env_var: SENTINEL_CLIENT_SECRET   # the secret itself goes in the
+                                                   # environment, not here
+
+defaults:
+  sample_size: 2000
+  sample_strategy: recent             # cheapest strategy against a live workspace
+  seed: 42
+
+sources:
+  - name: "<a-short-name-for-this-source>"   # used as the key everywhere in the report
+    adapter: sentinel
+    query: '<YourTable> | where <optional filter>'   # KQL; a bounding `| take N`
+                                                       # is added automatically
+    # event_class: activity   # uncomment + set if this table has an actor
+                               # (a person/process that did something) -- see
+                               # README.md "The checks" (C8) for activity/state/mixed
+    owner: "<team-or-person-who-owns-fixes-for-this-source>@example.com"
+
+# Add one more `- name: ...` entry per table/log type you want scored
+# separately -- a single query that mixes types gets flagged as "mixed log
+# types" rather than scored against any one profile (see PROFILES.md).
+# sentinel:securityevent and sentinel:signinlogs profiles ship with the tool
+# for the two most common tables.

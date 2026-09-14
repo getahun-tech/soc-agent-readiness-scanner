@@ -1,0 +1,43 @@
+# Starter config for scanning a live Elastic/OpenSearch source. Copy this
+# file, replace every <...> placeholder, then:
+#
+#   pip install -e ".[elastic]"
+#   scanner validate-config --config elastic.yaml   # catches typos first
+#   $env:ELASTIC_API_KEY = "<your api key>"          # PowerShell; set in the
+#                                                     # shell, never in a file
+#   scanner scan --config elastic.yaml --format markdown
+#
+# See CONFIG.md ("elastic" section) for every field, and SECURITY.md for
+# the read-only guarantee and credential-handling rules this relies on.
+#
+# Use a scoped API key with only read privileges on the target index --
+# the adapter checks this itself and refuses to run against a key that can
+# write or delete.
+
+version: "1.0"
+ruleset_version: "1"
+
+elastic:
+  url: "<https://your-elastic-host:9200>"
+  api_key_env_var: ELASTIC_API_KEY    # the key itself goes in the environment, not here
+  verify_ssl: true                    # set false only for a self-signed cert you trust
+
+defaults:
+  sample_size: 2000
+  sample_strategy: random             # Elastic's random_score is seedable server-side,
+                                       # so this is as cheap as "recent" here
+  seed: 42
+
+sources:
+  - name: "<a-short-name-for-this-source>"   # used as the key everywhere in the report
+    adapter: elastic
+    query: '<field>:<value>'          # a Lucene query_string; use "*" to match everything
+    index: "<your-index-or-index-pattern>"   # e.g. logs-firewall-*
+    # event_class: activity   # uncomment + set if this index has an actor
+                               # (a person/process that did something) -- see
+                               # README.md "The checks" (C8) for activity/state/mixed
+    owner: "<team-or-person-who-owns-fixes-for-this-source>@example.com"
+
+# Add one more `- name: ...` entry per index/log type you want scored
+# separately -- a single query that mixes types gets flagged as "mixed log
+# types" rather than scored against any one profile (see PROFILES.md).

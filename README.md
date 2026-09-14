@@ -13,6 +13,13 @@ advisory-only, and C8 is scored only when a source declares its
 `event_class` — see below) and derives automation eligibility from a
 small, explicit set of gates — never a threshold on the overall score.
 
+**Works directly against Splunk, Microsoft Sentinel, and
+Elastic/OpenSearch — or a local file export for a quick, offline
+check.** Point it at the Security Information and Event Management
+(SIEM) system you already run and it samples live data over a
+read-only connection; point it at an export and it runs with no
+network access at all. Same checks, same report, either way.
+
 ## What this tool does not do
 
 - It does not fix data quality problems, or modify/delete anything at
@@ -52,7 +59,46 @@ scanner scan --config scanner.yaml --format markdown
 The emitted config holds only what you chose — set each source's
 `owner:`, then grow it from there ([CONFIG.md](CONFIG.md)).
 
-To see every check fire, scan the bundled demo instead:
+**Scanning a live SIEM source** works the same way, just with a
+connection block instead of a file path — same checks, same report, no
+export step:
+
+```yaml
+# scanner.yaml
+version: "1.0"
+ruleset_version: "1"
+splunk:
+  host: "splunk.example.com"
+  token_env_var: SPLUNK_TOKEN   # read from the environment, never from this file
+sources:
+  - name: firewall
+    adapter: splunk
+    query: 'index=network sourcetype=pan:traffic'
+    owner: "network-security@example.com"
+```
+
+```bash
+export SPLUNK_TOKEN=...
+scanner scan --config scanner.yaml --format markdown
+```
+
+`adapter: sentinel` and `adapter: elastic` work the same way, with
+their own connection block. Every remote adapter checks the account's
+capabilities before it runs a single search and refuses outright if it
+finds anything write-capable — see [CONFIG.md](CONFIG.md) for the
+connection details and [SECURITY.md](SECURITY.md) for the read-only and
+credential-handling guarantees.
+
+Copy-paste starter configs for each — every field commented, placeholder
+values instead of examples that look real — are in
+[`examples/`](examples/): [`splunk.yaml`](examples/splunk.yaml),
+[`sentinel.yaml`](examples/sentinel.yaml),
+[`elastic.yaml`](examples/elastic.yaml). Copy one, fill in the
+placeholders, set the credential environment variable it names, and
+`validate-config` before the first real scan.
+
+To see every check fire without touching a real system, scan the
+bundled demo instead:
 
 ```bash
 scanner scan --config examples/demo.yaml --format markdown
@@ -328,11 +374,11 @@ Not built in this version:
   not fix — see "What this tool does not do" above)
 - A web UI
 
-Adapters beyond file + Splunk were out of the original scope, but
-Microsoft Sentinel and Elastic/OpenSearch adapters are included as a
-follow-on addition, built the same way the Splunk adapter is: a narrow
-connection protocol the adapter depends on, a real implementation that
-lazily imports its client library as an optional extra
-(`pip install -e ".[sentinel]"` / `".[elastic]"`), and tests that run
-against a fake connection with no live server required. See
+The Sentinel and Elastic/OpenSearch adapters are built the same way
+the Splunk one is, for the same reason: each depends only on a narrow
+connection protocol, with a real implementation that lazily imports
+its client library as an optional extra
+(`pip install -e ".[sentinel]"` / `".[elastic]"`), so every adapter's
+test suite runs against a fake connection with no live server required
+— nothing here is tested only by hand against a real SIEM. See
 [CONFIG.md](CONFIG.md) for the `sentinel:`/`elastic:` connection blocks.
