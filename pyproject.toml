@@ -11,7 +11,7 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [
-    { name = "Betre Yacob Getahun", email = "contact@betregetahun.com" },
+    { name = "Betre Y. Getahun", email = "contact@betregetahun.com" },
 ]
 dependencies = [
     "pydantic>=2.5",
