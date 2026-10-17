@@ -128,6 +128,10 @@ first if you just want to check the config parses.
 
 ## Example output
 
+![HTML report screenshot showing the estate summary and a per-source completeness breakdown](docs/screenshot.png)
+
+*The HTML report for the bundled demo config -- estate summary, automation eligibility, and full C1-C8 detail per source.*
+
 This is the `origin_only_logs` sample — a source that is well attributed
 to its reporting device but never records who or what the event actually
 happened to:
